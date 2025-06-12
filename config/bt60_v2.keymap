@@ -6,7 +6,7 @@
 #include <dt-bindings/zmk/outputs.h>
 
 #define WIN
-//#define MAC
+#define MAC
 
 / {
   macros {
@@ -31,11 +31,11 @@
               label = "BT_PROFILE2";
           };
   
-          BT_Profile3: BT_prifile3 {
+          BT_Profile3: BT_profile3 {
               compatible = "zmk,behavior-macro";
               #binding-cells = <0>;
               bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_SEL 4>;
-              label = "BT_PRIFILE3";
+              label = "BT_profile3";
           };
       };
 
@@ -52,7 +52,8 @@
   keymap {
     compatible = "zmk,keymap";
     #ifdef WIN
-    default_layer {
+    base {
+      display-name = "base";
         // ------------------------------------------------------------------------------------------
         // | ESC |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  |  -  |  =  |   BSPC   |
         // | TAB  |  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |  [  |  ]  |   \     |
@@ -69,8 +70,8 @@
       >;
     };
 
-    mac_layout {
-      display-name = "mac";
+    os {
+      display-name = "os";
       bindings = <
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
@@ -132,7 +133,8 @@
     };
 
     #elif defined(MAC)
-    default_layer {
+    base {
+      display-name = "base";
         // ------------------------------------------------------------------------------------------
         // | ESC |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  |  -  |  =  |   BSPC   |
         // | TAB  |  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |  [  |  ]  |   \     |
@@ -149,8 +151,8 @@
       >;
     };
 
-    win_layout {
-      display-name = "win";
+    os {
+      display-name = "os";
       bindings = <
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
