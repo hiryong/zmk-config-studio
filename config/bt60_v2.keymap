@@ -6,9 +6,9 @@
 #include <dt-bindings/zmk/outputs.h>
 
 #define ANSI
-//#define ISO
-//#define ALL_1U
-//#define HHKB
+#define ISO
+#define ALL_1U
+#define HHKB
 
 / {
   macros {
