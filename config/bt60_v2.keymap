@@ -106,7 +106,7 @@
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans
-        &trans  &trans  &ktrans   &trans    &trans  &trans    &trans      &trans
+        &trans  &trans  &trans   &trans    &trans  &trans    &trans      &trans
       >;
     };
     layer5 {
@@ -116,7 +116,7 @@
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans
-        &trans  &trans  &ktrans   &trans    &trans  &trans    &trans      &trans
+        &trans  &trans  &trans   &trans    &trans  &trans    &trans      &trans
       >;
     };
     layer6 {
@@ -126,7 +126,7 @@
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans
-        &trans  &trans  &ktrans   &trans    &trans  &trans    &trans      &trans
+        &trans  &trans  &trans   &trans    &trans  &trans    &trans      &trans
       >;
     };
 
@@ -185,7 +185,7 @@
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans
-        &trans  &trans  &ktrans   &trans    &trans  &trans    &trans      &trans
+        &trans  &trans  &trans   &trans    &trans  &trans    &trans      &trans
       >;
     };
     layer5 {
@@ -195,7 +195,7 @@
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans
-        &trans  &trans  &ktrans   &trans    &trans  &trans    &trans      &trans
+        &trans  &trans  &trans   &trans    &trans  &trans    &trans      &trans
       >;
     };
     layer6 {
@@ -205,7 +205,7 @@
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans
         &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans
-        &trans  &trans  &ktrans   &trans    &trans  &trans    &trans      &trans
+        &trans  &trans  &trans   &trans    &trans  &trans    &trans      &trans
       >;
     };
     #else
