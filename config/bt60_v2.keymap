@@ -70,6 +70,7 @@
       >;
     };
     win_layout {
+                display-name = "win";
                 bindings = <
     &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
     &trans  &trans  &trans    &trans    &trans  &trans    &trans      &trans  &trans  &trans  &trans  &trans  &trans  &trans
