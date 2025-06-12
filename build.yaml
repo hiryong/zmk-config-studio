@@ -20,3 +20,5 @@
 ---
 include:
   - board: bt60_v2
+   snippet: studio-rpc-usb-uart
+   cmake-args: -DCONFIG_ZMK_STUDIO=y
