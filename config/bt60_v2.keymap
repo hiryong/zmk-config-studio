@@ -41,9 +41,9 @@
 
   chosen {
   #ifdef WIN
-    zmk,physical-layout = &layout_60_win;
+    zmk,physical-layout = &layout_60_ansi;
   #elif defined(MAC)
-    zmk,physical-layout = &layout_60_mac;
+    zmk,physical-layout = &layout_60_ansi;
   #else
   #error "Layout not defined, please define a layout by uncommenting the appropriate line in bt60_v2.keymap"
   #endif
