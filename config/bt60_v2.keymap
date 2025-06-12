@@ -39,11 +39,10 @@ macros {
     };
 
   chosen {
-  #ifdef ANSI
+  #ifdef WIN
     zmk,physical-layout = &layout_60_win;
-  #elif defined(ISO)
+  #elif defined(MAC)
     zmk,physical-layout = &layout_60_mac;
-  #elif defined(ALL_1U)
   #else
   #error "Layout not defined, please define a layout by uncommenting the appropriate line in bt60_v2.keymap"
   #endif
