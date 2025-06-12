@@ -67,8 +67,6 @@ macros {
 &kp LSHFT  &kp Z      &kp X     &kp C     &kp V      &kp B     &kp N       &kp M      &kp COMMA  &kp DOT  &kp FSLH  &kp RSHFT
            &kp LCTRL  &kp LGUI  &kp LALT  &kp SPACE  &kp RALT  &kp C_MENU  &kp RCTRL  &mo 2
             >;
-
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
 
         mac_layout {
@@ -117,8 +115,6 @@ macros {
 &kp LSHFT  &kp Z      &kp X     &kp C     &kp V      &kp B     &kp N     &kp M      &kp COMMA  &kp DOT  &kp FSLH  &kp RSHFT
            &kp LCTRL  &kp LALT  &kp LGUI  &kp SPACE  &kp RGUI  &kp RALT  &kp RCTRL  &mo 2
             >;
-
-            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN>;
         };
 
         win_layout {
