@@ -30,7 +30,7 @@
     BT_Profile3: BT_Profile3 {
       compatible = "zmk,behavior-macro";
       #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_SEL 4>;
+      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_SEL 3>;
       label = "BT_PROFILE3";
     };
   };
