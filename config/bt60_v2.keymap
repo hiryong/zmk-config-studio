@@ -12,25 +12,25 @@
     BT_Profile0: BT_Profile0 {
       compatible = "zmk,behavior-macro";
       #binding-cells = <0>;
-      bindings = <&bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &delay_ms 700 &bt BT_SEL 0>;
+      bindings = <&bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 0>;
       label = "BT_PROFILE0";
     };
     BT_Profile1: BT_Profile1 {
       compatible = "zmk,behavior-macro";
       #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 2 &bt BT_DISC 3 &delay_ms 700 &bt BT_SEL 1>;
+      bindings = <&bt BT_DISC 0 &bt BT_DISC 2 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 1>;
       label = "BT_PROFILE1";
     };
     BT_Profile2: BT_Profile2 {
       compatible = "zmk,behavior-macro";
       #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 3 &delay_ms 700 &bt BT_SEL 2>;
+      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 2>;
       label = "BT_PROFILE2";
     };
     BT_Profile3: BT_Profile3 {
       compatible = "zmk,behavior-macro";
       #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &delay_ms 700 &bt BT_SEL 3>;
+      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &macro_wait_time 700 &bt BT_SEL 3>;
       label = "BT_PROFILE3";
     };
   };
