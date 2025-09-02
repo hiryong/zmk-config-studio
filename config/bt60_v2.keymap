@@ -17,33 +17,6 @@
             #binding-cells = ;
             bindings = <&macro_param_1to1>, <&bt BT_DISC MACRO_PLACEHOLDER>, <&macro_param_1to1>, <&bt BT_SEL MACRO_PLACEHOLDER>;
         };
-    
-
-
-        BT_Profile0: BT_Profile0 {
-          compatible = "zmk,behavior-macro";
-          wait-ms = <40>;
-          tap-ms = <40>;
-          #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &bt BT_SEL 0>;
-          label = "BT_PROFILE0";
-        };
-        BT_Profile1: BT_Profile1 {
-          compatible = "zmk,behavior-macro";
-          wait-ms = <40>;
-          tap-ms = <40>;
-          #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &bt BT_SEL 1>;
-          label = "BT_PROFILE1";
-        };
-        BT_Profile2: BT_Profile2 {
-          compatible = "zmk,behavior-macro";
-          wait-ms = <40>;
-          tap-ms = <40>;
-          #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &bt BT_SEL 2>;
-          label = "BT_PROFILE2";
-        };
     };
 
   chosen {
