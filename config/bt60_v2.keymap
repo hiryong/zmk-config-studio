@@ -9,31 +9,11 @@
 
 / {
   macros {
-    BT_Profile0: BT_Profile0 {
-      compatible = "zmk,behavior-macro";
-      #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 0>;
-      label = "BT_PROFILE0";
-    };
-    BT_Profile1: BT_Profile1 {
-      compatible = "zmk,behavior-macro";
-      #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 1>;
-      label = "BT_PROFILE1";
-    };
-    BT_Profile2: BT_Profile2 {
-      compatible = "zmk,behavior-macro";
-      #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 2>;
-      label = "BT_PROFILE2";
-    };
-    BT_Profile3: BT_Profile3 {
-      compatible = "zmk,behavior-macro";
-      #binding-cells = <0>;
-      bindings = <&bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &macro_wait_time 700 &bt BT_SEL 3>;
-      label = "BT_PROFILE3";
-    };
-  };
+        bt_profile: bt_profile {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = ;
+            bindings = <&macro_param_1to1 &bt BT_DISC MACRO_PLACEHOLDER &macro_wait_time 50 &macro_param_1to1 &bt BT_SEL MACRO_PLACEHOLDER>;
+        };
 
   chosen {
     zmk,physical-layout = &layout_60_ansi;
@@ -68,7 +48,7 @@
       display-name = "raise";
       bindings = <
         &kp GRAVE &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12 &kp DEL
-        &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &BT_Profile3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
+        &tog 1 &bt_profile 0 &bt_profile 1 &bt_profile 2 &bt_profile 3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
         &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
         &trans &bl BL_TOG &bl BL_DEC &bl BL_INC &trans &trans &trans &trans &trans &trans &kp UP &mo 3
         &trans &trans &trans &trans &kp LEFT &kp DOWN &kp RIGHT &trans
