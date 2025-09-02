@@ -11,20 +11,26 @@
   macros {
         BT_Profile0: BT_Profile0 {
           compatible = "zmk,behavior-macro";
+          wait-ms = <40>;
+          tap-ms = <40>;
           #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 0>;
+          bindings = <&bt BT_DISC 3 &bt BT_SEL 0>;
           label = "BT_PROFILE0";
         };
         BT_Profile1: BT_Profile1 {
           compatible = "zmk,behavior-macro";
+          wait-ms = <40>;
+          tap-ms = <40>;
           #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 1>;
+          bindings = <&bt BT_DISC 3 &bt BT_SEL 1>;
           label = "BT_PROFILE1";
         };
         BT_Profile2: BT_Profile2 {
           compatible = "zmk,behavior-macro";
+          wait-ms = <40>;
+          tap-ms = <40>;
           #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 2>;
+          bindings = <&bt BT_DISC 3 &bt BT_SEL 2>;
           label = "BT_PROFILE2";
         };
     };
