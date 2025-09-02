@@ -9,25 +9,22 @@
 
 / {
   macros {
-        bt_profile: bt_profile {
-            compatible = "zmk,behavior-macro-one-param";
-            #binding-cells = <1>;
-            bindings = <
-                &macro_param_1to1,
-                &bt BT_DISC MACRO_PLACEHOLDER,
-                &macro_wait_time 50,
-                &bt BT_DISC 0,
-                &macro_wait_time 50,
-                &bt BT_DISC 1,
-                &macro_wait_time 50,
-                &bt BT_DISC 2,
-                &macro_wait_time 50,
-                &bt BT_DISC 3,
-                &macro_wait_time 50,
-                &bt BT_SEL MACRO_PLACEHOLDER
-            >;
-        };
-    };
+        bt_profile: bt_profile {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = 
+                <&bt BT_DISC 0>,
+                <&macro_wait_time 50>,
+                <&bt BT_DISC 1>,
+                <&macro_wait_time 50>,
+                <&bt BT_DISC 2>,
+                <&macro_wait_time 50>,
+                <&bt BT_DISC 3>,
+                <&macro_wait_time 50>,
+                <&macro_param_1to1>,
+                <&bt BT_SEL MACRO_PLACEHOLDER>;
+        };
+    };
 
   chosen {
     zmk,physical-layout = &layout_60_ansi;
