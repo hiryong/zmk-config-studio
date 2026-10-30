@@ -8,10 +8,10 @@
 
 #define ANSI
 
-// Soft Off (official ZMK setting): how long the key must be held before release turns the
-// keyboard off is set in ryong-behaviors.json (key.ryong.com → Combos & Macros → Settings).
-// Place Soft Off on any key with ZMK Studio; turning back on is Fn + that same key held 3 s
-// (src/bt60_power_confirm.c).
+// Soft Off (official ZMK behavior): on Fn + Left Ctrl by default (raise layer). Hold it, then release, to
+// turn off; the hold time is set in ryong-behaviors.json (key.ryong.com → Combos & Macros → Settings).
+// It can be moved to any key with ZMK Studio; turning back on is Fn + that same key held 3 s
+// (src/bt60_power_confirm.c). Only Fn wakes the keyboard, so Fn is always part of turning on.
 
 / {
   chosen {
@@ -50,7 +50,7 @@
         &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &BT_Profile3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
         &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
         &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &kp UP &mo 3
-        &trans &trans &trans &trans &kp LEFT &kp DOWN &kp RIGHT &trans
+        &soft_off &trans &trans &trans &kp LEFT &kp DOWN &kp RIGHT &trans
       >;
     };
 

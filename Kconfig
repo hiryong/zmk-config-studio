@@ -1,5 +1,5 @@
 config BT60_POWER_CONFIRM
-    bool "Require Fn+Space held to turn on after a key soft-off"
+    bool "Require Fn + the Soft Off key held to turn on after a key soft-off"
     default y
     depends on ZMK_PM_SOFT_OFF && SOC_SERIES_NRF52X
 
@@ -9,12 +9,12 @@ config BT60_POWER_CONFIRM_FN_POSITION
     int "Key position of the Fn key"
     default 60
 
-config BT60_POWER_CONFIRM_SPACE_POSITION
-    int "Key position of the Space key"
-    default 56
+config BT60_POWER_CONFIRM_FALLBACK_POSITION
+    int "Key used with Fn to turn on when the keymap has no Soft Off key (Left Ctrl)"
+    default 53
 
 config BT60_POWER_CONFIRM_HOLD_MS
-    int "How long Fn+Space must be held to turn on"
+    int "How long Fn + the Soft Off key must be held to turn on"
     default 3000
 
 config BT60_POWER_CONFIRM_TIMEOUT_MS
