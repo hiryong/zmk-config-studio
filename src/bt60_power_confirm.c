@@ -5,8 +5,8 @@
  *   example on the Fn layer). bt60.keymap sets its official hold-time-ms to 3 s.
  *   If Soft Off fires while Fn is still held, sleep waits until Fn is released,
  *   because Fn is the wake key and would wake the chip again at once.
- * - Wake: only Fn (bottom-right key) wakes the chip from System OFF
- *   (see bt60.overlay). This is wiring, so Fn must stay in that spot.
+ * - Wake: only the wake key (Fn, bottom right, by default) wakes the chip from System OFF
+ *   (config/ryong-wake.dtsi, changed on key.ryong.com).
  * - On: after a Soft Off, the next wake looks up the current keymap (ZMK Studio
  *   changes included) for the key(s) holding Soft Off, and waits for Fn plus
  *   that key held together for 3 s (any order). Key input is not sent while
@@ -35,7 +35,7 @@ LOG_MODULE_REGISTER(bt60_power_confirm, CONFIG_ZMK_LOG_LEVEL);
 #define MARK_REG 1 /* GPREGRET2 (GPREGRET is used by the bootloader) */
 #define MARK_VALUE 0xB6
 
-#define POS_FN CONFIG_BT60_POWER_CONFIRM_FN_POSITION
+#define POS_FN CONFIG_RYONG_WAKE_POSITION /* the wake key (Fn by default) */
 #define POS_FALLBACK CONFIG_BT60_POWER_CONFIRM_FALLBACK_POSITION
 #define MAX_POS 64
 
