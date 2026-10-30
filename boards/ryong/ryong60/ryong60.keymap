@@ -15,6 +15,7 @@
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 40    // default: 10
 
 #include <dt-bindings/zmk/pointing.h>
+#include "ryong-behaviors.dtsi"
 
 
 &soft_off {
@@ -49,29 +50,6 @@
  *  media : Fn + 오른쪽 Shift — 미디어·볼륨·밝기, A = 블루투스 전부 지우기, D = 현재 기기 지우기, PgUp/PgDn/Home/End
  */
 / {
- macros {
-        BT_Profile0: BT_Profile0 {
-          compatible = "zmk,behavior-macro";
-          wait-ms = <40>;
-          tap-ms = <40>;
-          #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 0>;
-        };
-        BT_Profile1: BT_Profile1 {
-          compatible = "zmk,behavior-macro";
-          wait-ms = <40>;
-          tap-ms = <40>;
-          #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 1>;
-        };
-        BT_Profile2: BT_Profile2 {
-          compatible = "zmk,behavior-macro";
-          wait-ms = <40>;
-          tap-ms = <40>;
-          #binding-cells = <0>;
-          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 2>;
-        };
-    };
 
 
   keymap {
@@ -103,7 +81,7 @@
       display-name = "raise";
       bindings = <
         &kp GRAVE &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12 &kp DEL
-        &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &bt BT_SEL 3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
+        &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &BT_Profile3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
         &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
         &trans &bl BL_TOG &bl BL_DEC &bl BL_INC &trans &trans &trans &trans &trans &trans &kp UP &mo 3
         &trans &trans &trans &pw_off 0 SPACE &kp LEFT &kp DOWN &kp RIGHT &trans
