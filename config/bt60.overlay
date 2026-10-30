@@ -2,7 +2,7 @@
  * Soft-off wake: only the Fn key (bottom right, matrix RC(5,13)) wakes the keyboard.
  * Matrix is col2row: column 13 = P0.12 (driven high before off),
  * row 5 = P1.04 (input, pull-down).
- * After waking, src/bt60_power_confirm.c asks for Fn + the off key held 3 s.
+ * After waking, src/bt60_power_confirm.c asks for Fn+Space held 3 s.
  * The matrix keeps its normal wakeup-source so 15 min idle sleep still wakes on
  * any key; ZMK turns that off by itself when entering soft-off.
  */
