@@ -1,0 +1,19 @@
+# Copyright (c) 2021 Nick Winans
+# SPDX-License-Identifier: MIT
+
+if BOARD_ZMK_RULE60
+
+config ZMK_KEYBOARD_NAME
+    default "ryong60"
+
+if USB_DEVICE_STACK
+
+config USB_NRFX
+    default y
+
+endif # USB_DEVICE_STACK
+
+config BT_CTLR
+    default BT
+
+endif # BOARD_ZMK_RULE60

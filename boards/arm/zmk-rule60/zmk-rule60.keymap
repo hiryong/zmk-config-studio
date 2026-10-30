@@ -1,0 +1,157 @@
+/*
+ * Copyright (c) 2021 Nick Winans
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/rgb.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/backlight.h>
+#include <dt-bindings/zmk/outputs.h>
+
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 3000  // default: 600
+#define ZMK_POINTING_DEFAULT_SCRL_VAL 40    // default: 10
+
+#include <dt-bindings/zmk/pointing.h>
+
+
+&soft_off {
+  hold-time-ms = <3000>; 
+};
+
+/ {
+  behaviors {
+    // 즉시 끄기(떼는 순간). 아래 gr_off 의 '길게 누름' 쪽에서만 씀
+    so_now: so_now {
+      compatible = "zmk,behavior-soft-off";
+      #binding-cells = <0>;
+    };
+    // Fn + Esc : 짧게 = ` (원래 기능), 3초 넘게 누른 뒤 떼면 = 전원 끄기
+    //   다시 켤 때도 Fn + Esc 3초 (ryong60_power.c). 백라이트가 한 번 깜빡이면 3초가 된 것 → 손 떼기
+    gr_off: gr_off {
+      compatible = "zmk,behavior-hold-tap";
+      #binding-cells = <2>;
+      flavor = "tap-preferred";
+      tapping-term-ms = <3000>;
+      bindings = <&so_now>, <&kp>;
+    };
+  };
+};
+
+/*
+ * ryong60 키맵 — 사용자의 BT60 V2 설정(hiryong/zmk-config-studio, bt60_v2.keymap)을 그대로 옮김
+ *  base  : Mac 배열 (Ctrl · Alt(Option) · GUI(Cmd) · Space · GUI · Alt · Ctrl · Fn)
+ *  os    : Fn + Tab 으로 켜고 끔 → Windows 배열 (Ctrl · Win · Alt · Space · Alt · Menu · Ctrl · Fn)
+ *  raise : Fn(맨 아래 맨 오른쪽) — Esc 자리 = ` (3초 누르고 떼면 전원 끄기), F1~F12, / = ↑, 아래 줄 = ← ↓ →, Z/X/C = 백라이트, Q/W/E/R = 블루투스 1~4,
+ *          T = USB/블루투스 전환, Enter = 부트로더, \ = Studio 잠금 해제
+ *  media : Fn + 오른쪽 Shift — 미디어·볼륨·밝기, A = 블루투스 전부 지우기, D = 현재 기기 지우기, PgUp/PgDn/Home/End
+ */
+/ {
+ macros {
+        BT_Profile0: BT_Profile0 {
+          compatible = "zmk,behavior-macro";
+          wait-ms = <40>;
+          tap-ms = <40>;
+          #binding-cells = <0>;
+          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 0>;
+        };
+        BT_Profile1: BT_Profile1 {
+          compatible = "zmk,behavior-macro";
+          wait-ms = <40>;
+          tap-ms = <40>;
+          #binding-cells = <0>;
+          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 1>;
+        };
+        BT_Profile2: BT_Profile2 {
+          compatible = "zmk,behavior-macro";
+          wait-ms = <40>;
+          tap-ms = <40>;
+          #binding-cells = <0>;
+          bindings = <&bt BT_DISC 3 &macro_wait_time 50 &bt BT_SEL 2>;
+        };
+    };
+
+
+  keymap {
+    compatible = "zmk,keymap";
+
+    base {
+      display-name = "base";
+      bindings = <
+        &gresc &kp N1 &kp N2 &kp N3 &kp N4 &kp N5 &kp N6 &kp N7 &kp N8 &kp N9 &kp N0 &kp MINUS &kp EQUAL &kp BSPC
+        &kp TAB  &kp Q  &kp W  &kp E  &kp R  &kp T  &kp Y  &kp U  &kp I  &kp O  &kp P  &kp LBKT &kp RBKT &kp BSLH
+        &kp CAPS &kp A  &kp S  &kp D  &kp F  &kp G  &kp H  &kp J  &kp K  &kp L  &kp SEMI &kp SQT &kp RET
+        &kp LSHFT &kp Z  &kp X  &kp C  &kp V  &kp B  &kp N  &kp M  &kp COMMA &kp DOT &kp FSLH &kp RSHFT
+        &kp LCTRL &kp LALT &kp LGUI &kp SPACE &kp RGUI &kp RALT &kp RCTRL &mo 2
+      >;
+    };
+
+    os {
+      display-name = "os";
+      bindings = <
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &kp LGUI &kp LALT &trans &kp RALT &kp C_MENU &trans &trans
+      >;
+    };
+
+    raise {
+      display-name = "raise";
+      bindings = <
+        &gr_off 0 GRAVE &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12 &kp DEL
+        &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &bt BT_SEL 3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
+        &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
+        &trans &bl BL_TOG &bl BL_DEC &bl BL_INC &trans &trans &trans &trans &trans &trans &kp UP &mo 3
+        &trans &trans &trans &trans &kp LEFT &kp DOWN &kp RIGHT &trans
+      >;
+    };
+
+    media {
+      display-name = "media";
+      bindings = <
+        &kp TILDE &kp C_BRI_DEC &kp C_BRI_INC &kp C_AC_DESKTOP_SHOW_ALL_WINDOWS &kp C_AC_SEARCH &trans &trans &kp C_PREV &kp C_PLAY_PAUSE &kp C_NEXT &kp C_MUTE &kp C_VOL_DN &kp C_VOL_UP &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &bt BT_CLR_ALL &trans &bt BT_CLR &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &kp PG_UP &trans
+        &trans &trans &trans &trans &kp HOME &kp PG_DN &kp END &trans
+      >;
+    };
+
+    layer4 {
+      display-name = "layer4";
+      bindings = <
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans
+      >;
+    };
+
+    layer5 {
+      display-name = "layer5";
+      bindings = <
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans
+      >;
+    };
+
+    layer6 {
+      display-name = "layer6";
+      bindings = <
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans
+        &trans &trans &trans &trans &trans &trans &trans &trans
+      >;
+    };
+  };
+};

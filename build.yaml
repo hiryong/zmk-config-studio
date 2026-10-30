@@ -1,0 +1,5 @@
+# ryong60 펌웨어 빌드 목록 (GitHub Actions)
+include:
+  - board: zmk-rule60
+    snippet: studio-rpc-usb-uart
+    artifact-name: ryong60
