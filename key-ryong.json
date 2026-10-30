@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "keyboards": [
+    {
+      "id": "bt60-cheeto",
+      "name": "BT60 V2 · Cheeto",
+      "note": "No backlight · Windows keymap",
+      "branch": "non_LED_windows_cheeto",
+      "workflow": "build.yml",
+      "artifact": "firmware",
+      "keymap": "config/bt60.keymap",
+      "match": ["Cheeto"],
+      "unlockKey": "Fn + \\",
+      "bootloaderKey": "Fn + Enter",
+      "layout": "60-ansi"
+    },
+    {
+      "id": "bt60-oreo",
+      "name": "BT60 V2 · Oreo",
+      "note": "Backlit · Mac keymap",
+      "branch": "LED_mac_oreo",
+      "workflow": "build.yml",
+      "artifact": "firmware",
+      "keymap": "config/bt60.keymap",
+      "match": ["Oreo"],
+      "unlockKey": "Fn + \\",
+      "bootloaderKey": "Fn + Enter",
+      "layout": "60-ansi"
+    }
+  ]
+}
