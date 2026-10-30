@@ -1,0 +1,28 @@
+/*
+ * Soft-off wake: only the Space key (matrix RC(5,6)) wakes the keyboard.
+ * Matrix is col2row: column 6 = P0.28 (driven high before off),
+ * row 5 = P1.04 (input, pull-down).
+ * The matrix keeps its normal wakeup-source so 15 min idle sleep still wakes on
+ * any key; ZMK turns that off by itself when entering soft-off.
+ */
+
+/ {
+    wake_keys {
+        compatible = "gpio-keys";
+        space_wake_key: space_wake_key {
+            gpios = <&gpio1 4 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+        };
+    };
+
+    space_waker: space_waker {
+        compatible = "zmk,gpio-key-wakeup-trigger";
+        trigger = <&space_wake_key>;
+        wakeup-source;
+        extra-gpios = <&gpio0 28 GPIO_ACTIVE_HIGH>;
+    };
+
+    soft_off_wakers {
+        compatible = "zmk,soft-off-wakeup-sources";
+        wakeup-sources = <&space_waker>;
+    };
+};
