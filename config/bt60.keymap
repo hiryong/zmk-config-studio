@@ -36,19 +36,6 @@
     };
 
   behaviors {
-    // Fn+Space: tap = Space, hold 3 s = turn off (on release).
-    // Turning on: Fn wakes the keyboard, then Fn + the key holding an off behavior
-    // must be held 3 s (src/bt60_power_confirm.c). Moving space_off or off_3s to
-    // another key in ZMK Studio moves the turn-on combo with it.
-    space_off: space_off {
-      compatible = "zmk,behavior-hold-tap";
-      display-name = "Space / Off (3s)";
-      #binding-cells = <2>;
-      flavor = "tap-preferred";
-      tapping-term-ms = <3000>;
-      bindings = <&soft_off>, <&kp>;
-    };
-
     // Tap dance (not placed on any key; pick it in ZMK Studio if wanted):
     // tap once = Shift, tap twice = Caps Lock.
     td_shift_caps: td_shift_caps {
@@ -57,14 +44,6 @@
       #binding-cells = <0>;
       tapping-term-ms = <200>;
       bindings = <&kp LSHFT>, <&kp CAPS>;
-    };
-
-    // Off only (no tap key): hold 3 s and release to turn off.
-    off_3s: off_3s {
-      compatible = "zmk,behavior-soft-off";
-      display-name = "Off (hold 3s)";
-      #binding-cells = <0>;
-      hold-time-ms = <3000>;
     };
   };
 
@@ -104,7 +83,7 @@
         &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &bt BT_SEL 3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
         &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
         &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &kp UP &mo 3
-        &trans &trans &trans &space_off 0 SPACE &kp LEFT &kp DOWN &kp RIGHT &trans
+        &trans &trans &trans &trans &kp LEFT &kp DOWN &kp RIGHT &trans
       >;
     };
 
