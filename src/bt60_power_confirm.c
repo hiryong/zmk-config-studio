@@ -50,7 +50,9 @@ static bool off_pending; /* Soft Off requested while Fn was held */
 static void hold_done(struct k_work *work);
 static void timeout_done(struct k_work *work);
 static void power_off(struct k_work *work);
+static void recheck(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(hold_work, hold_done);
+static K_WORK_DELAYABLE_DEFINE(recheck_work, recheck);
 static K_WORK_DELAYABLE_DEFINE(timeout_work, timeout_done);
 static K_WORK_DEFINE(off_work, power_off);
 
@@ -106,11 +108,38 @@ static uint64_t soft_off_keys(void) {
 
 static bool combo_held(void) { return (held & BIT64(POS_FN)) && (held & soft_off_keys()); }
 
+/*
+ * Start or stop the 3 s hold timer from the current key state. Called on every
+ * key event and every 200 ms while confirming, because the keymap saved with
+ * ZMK Studio may finish loading after the keys were already pressed.
+ */
+static void update_hold(void) {
+    if (combo_held()) {
+        if (!k_work_delayable_is_pending(&hold_work)) {
+            k_work_schedule(&hold_work, K_MSEC(CONFIG_BT60_POWER_CONFIRM_HOLD_MS));
+        }
+    } else {
+        k_work_cancel_delayable(&hold_work);
+        if (timed_out) {
+            k_work_submit(&off_work);
+        }
+    }
+}
+
+static void recheck(struct k_work *work) {
+    if (!confirming) {
+        return;
+    }
+    update_hold();
+    k_work_schedule(&recheck_work, K_MSEC(200));
+}
+
 static void hold_done(struct k_work *work) {
     if (confirming && combo_held()) {
         LOG_INF("Fn + Soft Off key held, starting normally");
         confirming = false;
         k_work_cancel_delayable(&timeout_work);
+        k_work_cancel_delayable(&recheck_work);
     }
 }
 
@@ -120,6 +149,7 @@ static void timeout_done(struct k_work *work) {
     }
     if (combo_held()) {
         timed_out = true; /* wait for the hold to finish or be released */
+        update_hold();
         return;
     }
     LOG_INF("not confirmed, back to soft off");
@@ -157,16 +187,7 @@ static int on_position(const zmk_event_t *eh) {
         held &= ~bit;
     }
 
-    if (combo_held()) {
-        if (!k_work_delayable_is_pending(&hold_work)) {
-            k_work_schedule(&hold_work, K_MSEC(CONFIG_BT60_POWER_CONFIRM_HOLD_MS));
-        }
-    } else {
-        k_work_cancel_delayable(&hold_work);
-        if (timed_out) {
-            k_work_submit(&off_work);
-        }
-    }
+    update_hold();
     return ZMK_EV_EVENT_HANDLED;
 }
 
@@ -189,6 +210,7 @@ static int bt60_power_confirm_init(void) {
     if (mark == MARK_VALUE && !reset_pin && !usb) {
         confirming = true;
         k_work_schedule(&timeout_work, K_MSEC(CONFIG_BT60_POWER_CONFIRM_TIMEOUT_MS));
+        k_work_schedule(&recheck_work, K_MSEC(200));
     }
     return 0;
 }
