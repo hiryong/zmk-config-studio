@@ -47,27 +47,27 @@
         >;
     };
 
-    // ryong60: 전원 끄기(soft off) 뒤에는 Space 키 하나만 칩을 깨움 (ZMK 'Wakeup-only Key Switch' 방식).
-    //   ROW4(P0.22)를 켜 둔 채 COL6(P1.11)을 감시 → ROW4×COL6 = Space 만 반응, 다른 키는 무시.
-    //   깨어난 뒤에는 ryong60_power.c 가 Fn+Space 를 3초 누르고 있는지 확인하고, 아니면 다시 끔.
+    // ryong60: 전원 끄기(soft off) 뒤에는 Fn 키 하나만 칩을 깨움 (ZMK 'Wakeup-only Key Switch' 방식).
+    //   ROW4(P0.22)를 켜 둔 채 COL13(P0.31)을 감시 → ROW4×COL13 = Fn(맨 아래 맨 오른쪽)만 반응, 다른 키는 무시.
+    //   깨어난 뒤에는 ryong60_power.c 가 Fn + Soft Off 키를 3초 누르고 있는지 확인하고, 아니면 다시 끔.
     //   (15분 무입력 자동 절전은 이와 별개로 아무 키나 누르면 깨어남)
     wake_keys {
       compatible = "gpio-keys";
-      space_wake_key: space_wake_key {
-        gpios = <&gpio1 11 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
+      fn_wake_key: fn_wake_key {
+        gpios = <&gpio0 31 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
       };
     };
 
-    space_wakeup: space_wakeup {
+    fn_wakeup: fn_wakeup {
       compatible = "zmk,gpio-key-wakeup-trigger";
-      trigger = <&space_wake_key>;
+      trigger = <&fn_wake_key>;
       wakeup-source;
       extra-gpios = <&gpio0 22 GPIO_ACTIVE_HIGH>;
     };
 
     soft_off_wakers {
       compatible = "zmk,soft-off-wakeup-sources";
-      wakeup-sources = <&space_wakeup>;
+      wakeup-sources = <&fn_wakeup>;
     };
 
     kscan0: kscan {

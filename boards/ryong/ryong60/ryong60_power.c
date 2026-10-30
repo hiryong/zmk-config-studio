@@ -37,58 +37,72 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 #endif
 
 /*
- * ryong60: 전원 끄기 / 켜기 = Fn + Space 3초
+ * ryong60: 전원 끄기 / 켜기 (BT60 V2 Oreo·Cheeto 의 bt60_power_confirm.c 와 같은 방식)
  *
- *  끄기: 키맵의 pw_off(Fn 층 Space 자리)가 3초 넘게 눌린 뒤 떼면 ZMK soft off.
- *        이 파일은 그 순간 '키로 끈 것' 표시(GPREGRET2)를 남김 — 15분 자동 절전과 구분하려고.
- *  켜기: 끈 뒤에는 Space 하나만 칩을 깨움(dts). 깨어났을 때 표시가 있으면
- *        Fn+Space 가 3초 동안 눌려 있어야 켜진 채로 둠. 아니면(가방 속에서 Space 가 눌린 경우 등) 8초 안에 다시 끔.
- *        확인하는 동안 키 입력은 컴퓨터로 보내지 않음.
- *  예외: USB 를 꽂아서 깨거나, 리셋 버튼, 슬라이드 스위치로 껐다 켜면 바로 켜짐.
- *  3초가 되는 순간 백라이트가 한 번 깜빡임 → 손을 떼면 됨.
+ *  끄기: ZMK 공식 Soft Off. 키맵에서는 Fn + Space 자리. ZMK Studio 로 아무 키에나 옮길 수 있음.
+ *        누르고 있어야 하는 시간은 Soft Off 의 hold-time-ms (key.ryong.com 설정 탭).
+ *        Fn 을 누른 채로 꺼지면 Fn 을 뗄 때까지 기다렸다가 끔 — Fn 이 깨우는 키라서 바로 다시 깨어나지 않게.
+ *  깨우기: 끈 뒤에는 Fn 하나만 칩을 깨움 (dts). 배선으로 정해져 있어서 Fn 은 그 자리에 있어야 함.
+ *  켜기: 깨어나면 지금 키맵(ZMK Studio 로 바꾼 것 포함)에서 Soft Off 가 있는 키를 찾아,
+ *        Fn + 그 키를 함께 3초 누르면 켜짐 (누르는 순서 상관없음). 그동안 키 입력은 컴퓨터로 보내지 않음.
+ *        8초 안에 안 되면 다시 꺼짐. 키가 눌려 있는 동안은 기다림. 3초가 되는 순간 백라이트가 한 번 깜빡임.
+ *  예외: USB 를 꽂아서 깨거나 리셋 버튼이면 바로 켜짐. 15분 자동 절전은 zmk_pm_soft_off() 를 거치지 않으므로
+ *        예전처럼 아무 키로나 깨어남.
+ *  모든 soft off 는 링커 --wrap 으로 감싸서 GPREGRET2 에 표시를 남김 (CMakeLists.txt).
  */
+#include <zephyr/logging/log.h>
 #include <zephyr/drivers/led.h>
 #include <hal/nrf_power.h>
+#include <drivers/behavior.h>
+#include <zmk/behavior.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/position_state_changed.h>
-#include <zmk/events/activity_state_changed.h>
+#include <zmk/keymap.h>
+#include <zmk/matrix.h>
 #include <zmk/pm.h>
 #if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
 #include <zmk/backlight.h>
 #endif
 
-#define R60_POS_KEY 56      /* 키 위치 번호: Space (맨 아래 줄 4번째, RC(4,6)) */
-#define R60_POS_FN 60       /* 키 위치 번호: Fn (맨 아래 맨 오른쪽) */
+LOG_MODULE_REGISTER(ryong60_power, CONFIG_ZMK_LOG_LEVEL);
+
+#define R60_POS_FN 60       /* Fn (맨 아래 맨 오른쪽, RC(4,13)) — 깨우는 키 */
+#define R60_POS_FALLBACK 56 /* Space: 키맵에 Soft Off 가 하나도 없을 때 대신 쓰는 키 */
 #define R60_HOLD_MS 3000
-#define R60_GUARD_MS 8000
-#define R60_FLAG 0xA4       /* GPREGRET2 표시값 (0번 비트는 비움: 부트로더 CRC 건너뛰기 비트와 겹치지 않게) */
+#define R60_TIMEOUT_MS 8000
+#define R60_MARK_REG 1      /* GPREGRET2 (GPREGRET 은 부트로더가 씀) */
+#define R60_MARK 0xA4
+#define R60_MAX_POS 64
 
-static bool r60_fn, r60_key;          /* 지금 눌려 있는지 */
-static int64_t r60_key_t = -1;        /* Fn 을 누른 상태에서 Space 를 누른 시각 */
-static bool r60_guard, r60_ok;
-static int r60_held;                  /* 확인 중에 눌려 있는 키 수 */
+static bool confirming;
+static bool timed_out;
+static uint64_t swallowed; /* 확인 중에 눌린 키 — 뗄 때도 삼킴 */
+static uint64_t held;      /* 확인 중에 눌려 있는 키 */
+static bool fn_down;       /* 평소 Fn 상태 */
+static bool off_pending;   /* Fn 을 누른 채 꺼달라고 한 경우 */
 
-static void r60_set_flag(void) { nrf_power_gpregret_set(NRF_POWER, 1, R60_FLAG); }
+static void hold_done(struct k_work *work);
+static void timeout_done(struct k_work *work);
+static void power_off(struct k_work *work);
+static void recheck(struct k_work *work);
+static void blink_end(struct k_work *work);
+static K_WORK_DELAYABLE_DEFINE(hold_work, hold_done);
+static K_WORK_DELAYABLE_DEFINE(recheck_work, recheck);
+static K_WORK_DELAYABLE_DEFINE(timeout_work, timeout_done);
+static K_WORK_DELAYABLE_DEFINE(blink_work, blink_end);
+static K_WORK_DEFINE(off_work, power_off);
 
-/* 표시를 남겼는데 1초 뒤에도 아직 켜져 있으면(꺼지지 않았으면) 표시를 지움 → 자동 절전에서 깰 때 영향 없게 */
-static void r60_flag_clear(struct k_work *w) { nrf_power_gpregret_set(NRF_POWER, 1, 0); }
-static K_WORK_DELAYABLE_DEFINE(r60_flag_clear_work, r60_flag_clear);
-
-static void r60_blink_end(struct k_work *w);
-static K_WORK_DELAYABLE_DEFINE(r60_blink_end_work, r60_blink_end);
-
-static void r60_blink(void) {
+static void blink(void) {
 #if IS_ENABLED(CONFIG_ZMK_BACKLIGHT) && DT_HAS_CHOSEN(zmk_backlight)
     const struct device *bl = DEVICE_DT_GET(DT_CHOSEN(zmk_backlight));
-    if (!device_is_ready(bl)) {
-        return;
+    if (device_is_ready(bl)) {
+        led_set_brightness(bl, 0, zmk_backlight_is_on() ? 0 : 60);
+        k_work_reschedule(&blink_work, K_MSEC(250));
     }
-    led_set_brightness(bl, 0, zmk_backlight_is_on() ? 0 : 60);
-    k_work_reschedule(&r60_blink_end_work, K_MSEC(250));
 #endif
 }
 
-static void r60_blink_end(struct k_work *w) {
+static void blink_end(struct k_work *work) {
 #if IS_ENABLED(CONFIG_ZMK_BACKLIGHT) && DT_HAS_CHOSEN(zmk_backlight)
     const struct device *bl = DEVICE_DT_GET(DT_CHOSEN(zmk_backlight));
     if (device_is_ready(bl)) {
@@ -97,108 +111,150 @@ static void r60_blink_end(struct k_work *w) {
 #endif
 }
 
-/* 3초 지점: 아직 Fn+Space 가 눌려 있으면 깜빡임 (끌 때·켤 때 모두) */
-static void r60_hold_reached(struct k_work *w) {
-    if (r60_fn && r60_key) {
-        if (r60_guard) {
-            r60_ok = true; /* 켜기 확인 완료 */
+int __real_zmk_pm_soft_off(void);
+
+int __wrap_zmk_pm_soft_off(void) {
+    if (!confirming && fn_down) {
+        LOG_INF("soft off waits for Fn release");
+        off_pending = true;
+        return 0;
+    }
+    nrf_power_gpregret_set(NRF_POWER, R60_MARK_REG, R60_MARK);
+    int ret = __real_zmk_pm_soft_off();
+    /* 돌아왔다면 끄기에 실패한 것: 키보드가 막히지 않게 정상 동작으로 */
+    LOG_ERR("soft off failed (%d)", ret);
+    nrf_power_gpregret_set(NRF_POWER, R60_MARK_REG, 0);
+    confirming = false;
+    k_work_cancel_delayable(&hold_work);
+    k_work_cancel_delayable(&timeout_work);
+    return ret;
+}
+
+static void power_off(struct k_work *work) { zmk_pm_soft_off(); }
+
+/* 지금 키맵의 모든 층에서 Soft Off 가 있는 키 위치 */
+static uint64_t soft_off_keys(void) {
+    uint64_t mask = 0;
+#if DT_NODE_EXISTS(DT_NODELABEL(soft_off))
+    const struct device *soft_off_dev = DEVICE_DT_GET(DT_NODELABEL(soft_off));
+    for (int l = 0; l < ZMK_KEYMAP_LAYERS_LEN; l++) {
+        zmk_keymap_layer_id_t id = zmk_keymap_layer_index_to_id(l);
+        if (id == ZMK_KEYMAP_LAYER_ID_INVAL) {
+            continue;
         }
-        r60_blink();
+        for (int p = 0; p < ZMK_KEYMAP_LEN && p < R60_MAX_POS; p++) {
+            const struct zmk_behavior_binding *b = zmk_keymap_get_layer_binding_at_idx(id, p);
+            if (b != NULL && b->behavior_dev != NULL && zmk_behavior_get_binding(b->behavior_dev) == soft_off_dev) {
+                mask |= BIT64(p);
+            }
+        }
     }
-}
-static K_WORK_DELAYABLE_DEFINE(r60_hold_work, r60_hold_reached);
-
-/* 확인 시간 초과 → 다시 끔.
- * Space 가 계속 눌려 있으면(가방 속에서 눌린 채 등) 바로 끄면 즉시 다시 깨어나 재부팅을 반복하므로, 뗄 때까지 기다렸다가 끔 */
-static void r60_guard_timeout(struct k_work *w);
-static K_WORK_DELAYABLE_DEFINE(r60_guard_work, r60_guard_timeout);
-static void r60_guard_timeout(struct k_work *w) {
-    if (!r60_guard || r60_ok) {
-        return;
-    }
-    if (r60_key) {
-        k_work_reschedule(&r60_guard_work, K_MSEC(500));
-        return;
-    }
-    r60_set_flag();
-    if (zmk_pm_soft_off() != 0) {
-        /* 끄기에 실패하면 키가 계속 막히지 않도록 정상 동작으로 되돌림 */
-        nrf_power_gpregret_set(NRF_POWER, 1, 0);
-        r60_guard = false;
-    }
+#endif
+    mask &= ~BIT64(R60_POS_FN);
+    return mask ? mask : BIT64(R60_POS_FALLBACK);
 }
 
-/* 이 리스너는 CMakeLists 에서 app 대상의 맨 앞에 링크되어 키맵·hold-tap 보다 먼저 키 이벤트를 받음
- * (ZMK 이벤트 순서 = 링크 순서. 빌드 후 zmk.elf 의 .event_subscription 첫 항목인지 확인함) */
-static int r60_listener(const zmk_event_t *eh) {
+static bool combo_held(void) { return (held & BIT64(R60_POS_FN)) && (held & soft_off_keys()); }
+
+/* 키를 누르고 뗄 때마다, 그리고 확인 중 200ms 마다 — Studio 로 저장한 키맵이 늦게 읽혀도 맞게 */
+static void update_hold(void) {
+    if (combo_held()) {
+        if (!k_work_delayable_is_pending(&hold_work)) {
+            k_work_schedule(&hold_work, K_MSEC(R60_HOLD_MS));
+        }
+    } else {
+        k_work_cancel_delayable(&hold_work);
+        if (timed_out) {
+            k_work_submit(&off_work);
+        }
+    }
+}
+
+static void recheck(struct k_work *work) {
+    if (!confirming) {
+        return;
+    }
+    update_hold();
+    k_work_schedule(&recheck_work, K_MSEC(200));
+}
+
+static void hold_done(struct k_work *work) {
+    if (confirming && combo_held()) {
+        LOG_INF("Fn + Soft Off key held, starting normally");
+        confirming = false;
+        k_work_cancel_delayable(&timeout_work);
+        k_work_cancel_delayable(&recheck_work);
+        blink();
+    }
+}
+
+static void timeout_done(struct k_work *work) {
+    if (!confirming) {
+        return;
+    }
+    if (combo_held()) {
+        timed_out = true; /* 누르고 있는 중이면 끝날 때까지 기다림 */
+        update_hold();
+        return;
+    }
+    LOG_INF("not confirmed, back to soft off");
+    k_work_submit(&off_work);
+}
+
+/* CMakeLists 에서 app 대상에 직접 넣어 ZMK 소스보다 먼저 링크됨 → 키 이벤트를 키맵보다 먼저 받음 */
+static int on_position(const zmk_event_t *eh) {
     const struct zmk_position_state_changed *ev = as_zmk_position_state_changed(eh);
-    if (ev == NULL) {
+    if (ev == NULL || ev->position >= R60_MAX_POS) {
         return ZMK_EV_EVENT_BUBBLE;
     }
-    bool down = ev->state;
-    if (ev->position == R60_POS_FN) {
-        r60_fn = down;
-    }
-    if (ev->position == R60_POS_KEY) {
-        if (down) {
-            r60_key_t = r60_fn ? ev->timestamp : -1;
-        } else if (!r60_guard && r60_key_t >= 0 && ev->timestamp - r60_key_t > R60_HOLD_MS) {
-            /* 곧 키맵의 pw_off 가 soft off 를 부름 → 키로 끈 것 표시 */
-            r60_set_flag();
-            k_work_reschedule(&r60_flag_clear_work, K_MSEC(1000));
+    const uint64_t bit = BIT64(ev->position);
+
+    if (!confirming) {
+        if (!ev->state && (swallowed & bit)) {
+            swallowed &= ~bit; /* 켜는 동안 눌렀던 키를 뗀 것 */
+            return ZMK_EV_EVENT_HANDLED;
         }
-        r60_key = down;
-    }
-    if (r60_fn && r60_key && (ev->position == R60_POS_FN || ev->position == R60_POS_KEY) && down) {
-        k_work_reschedule(&r60_hold_work, K_MSEC(R60_HOLD_MS));
-    } else if (!(r60_fn && r60_key)) {
-        k_work_cancel_delayable(&r60_hold_work);
+        if (ev->position == R60_POS_FN) {
+            fn_down = ev->state;
+            if (!ev->state && off_pending) {
+                off_pending = false;
+                k_work_submit(&off_work);
+            }
+        }
+        return ZMK_EV_EVENT_BUBBLE;
     }
 
-    if (!r60_guard) {
-        return ZMK_EV_EVENT_BUBBLE;
+    if (ev->state) {
+        swallowed |= bit;
+        held |= bit;
+    } else {
+        swallowed &= ~bit;
+        held &= ~bit;
     }
-    /* 켜기 확인 중: 모든 키 입력을 삼킴, 확인이 끝나고 모든 키를 뗀 뒤부터 정상 동작 */
-    r60_held += down ? 1 : -1;
-    if (r60_held < 0) {
-        r60_held = 0;
-    }
-    if (r60_ok && r60_held == 0) {
-        r60_guard = false;
-        k_work_cancel_delayable(&r60_guard_work);
-    }
+    update_hold();
     return ZMK_EV_EVENT_HANDLED;
 }
 
-ZMK_LISTENER(a_ryong60_power_key, r60_listener);
-ZMK_SUBSCRIPTION(a_ryong60_power_key, zmk_position_state_changed);
+ZMK_LISTENER(a_ryong60_power, on_position);
+ZMK_SUBSCRIPTION(a_ryong60_power, zmk_position_state_changed);
 
-/* 켜기 확인 중(예: 가방 속에서 Space 가 계속 눌린 채)에 15분 자동 절전에 들어가면, 다시 깰 때도 확인하도록 표시를 남김
- * (안 그러면 눌린 Space 로 깨어나 확인 없이 켜지고 Space 가 계속 입력됨) */
-static int r60_activity_listener(const zmk_event_t *eh) {
-    const struct zmk_activity_state_changed *ev = as_zmk_activity_state_changed(eh);
-    if (ev != NULL && ev->state == ZMK_ACTIVITY_SLEEP && r60_guard && !r60_ok) {
-        r60_set_flag();
-    }
-    return ZMK_EV_EVENT_BUBBLE;
-}
-ZMK_LISTENER(ryong60_power_activity, r60_activity_listener);
-ZMK_SUBSCRIPTION(ryong60_power_activity, zmk_activity_state_changed);
+static int ryong60_power_confirm_init(void) {
+    const uint32_t mark = nrf_power_gpregret_get(NRF_POWER, R60_MARK_REG);
+    const uint32_t reason = nrf_power_resetreas_get(NRF_POWER);
+    const bool usb = nrf_power_usbregstatus_vbusdet_get(NRF_POWER);
 
-static int r60_wake_check(void) {
-    uint32_t why = nrf_power_resetreas_get(NRF_POWER);
-    nrf_power_resetreas_clear(NRF_POWER, why);
-    bool flag = nrf_power_gpregret_get(NRF_POWER, 1) == R60_FLAG;
-    nrf_power_gpregret_set(NRF_POWER, 1, 0);
+    nrf_power_gpregret_set(NRF_POWER, R60_MARK_REG, 0); /* 표시는 한 번만 씀 */
+    nrf_power_resetreas_clear(NRF_POWER, reason);
 
-    /* USB 가 꽂혀 있으면(VBUS 감지) 확인 없이 바로 켬 — 이 시점엔 ZMK USB 상태가 아직 준비 전이라 레지스터를 직접 읽음 */
-    bool usb = nrf_power_usbregstatus_vbusdet_get(NRF_POWER);
-    bool manual = why & (NRF_POWER_RESETREAS_RESETPIN_MASK | NRF_POWER_RESETREAS_VBUS_MASK);
-    if (flag && !usb && !manual) {
-        r60_guard = true;
-        k_work_schedule(&r60_guard_work, K_MSEC(R60_GUARD_MS));
+    const bool manual = reason & (NRF_POWER_RESETREAS_RESETPIN_MASK | NRF_POWER_RESETREAS_VBUS_MASK);
+    LOG_INF("mark 0x%02x reset 0x%08x usb %d", mark, reason, usb);
+
+    if (mark == R60_MARK && !manual && !usb) {
+        confirming = true;
+        k_work_schedule(&timeout_work, K_MSEC(R60_TIMEOUT_MS));
+        k_work_schedule(&recheck_work, K_MSEC(200));
     }
     return 0;
 }
 
-SYS_INIT(r60_wake_check, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+SYS_INIT(ryong60_power_confirm_init, APPLICATION, 0);

@@ -17,30 +17,15 @@
 #include <dt-bindings/zmk/pointing.h>
 #include "ryong-behaviors.dtsi"
 
-/ {
-  behaviors {
-    // 즉시 끄기(떼는 순간). 아래 pw_off 의 '길게 누름' 쪽에서만 씀
-    so_now: so_now {
-      compatible = "zmk,behavior-soft-off";
-      #binding-cells = <0>;
-    };
-    // Fn + Space : 짧게 = Space (원래 기능), 3초 넘게 누른 뒤 떼면 = 전원 끄기
-    //   다시 켤 때도 Fn + Space 3초 (ryong60_power.c). 백라이트가 한 번 깜빡이면 3초가 된 것 → 손 떼기
-    pw_off: pw_off {
-      compatible = "zmk,behavior-hold-tap";
-      #binding-cells = <2>;
-      flavor = "tap-preferred";
-      tapping-term-ms = <3000>;
-      bindings = <&so_now>, <&kp>;
-    };
-  };
-};
+// 전원: Fn + Space 자리에 ZMK 공식 Soft Off. 3초 누르고 떼면 꺼짐(시간은 ryong-behaviors.json → key.ryong.com 설정 탭).
+//   다시 켤 때 = Fn + Soft Off 가 있는 키 3초 (ryong60_power.c). Fn 만 칩을 깨우므로 Fn 은 꼭 같이 눌러야 함.
+//   ZMK Studio 로 Soft Off 를 다른 키에 옮기면 켜는 키도 따라감 (Fn + 그 키).
 
 /*
  * ryong60 키맵 — 사용자의 BT60 V2 설정(hiryong/zmk-config-studio, bt60_v2.keymap)을 그대로 옮김
  *  base  : Mac 배열 (Ctrl · Alt(Option) · GUI(Cmd) · Space · GUI · Alt · Ctrl · Fn)
  *  os    : Fn + Tab 으로 켜고 끔 → Windows 배열 (Ctrl · Win · Alt · Space · Alt · Menu · Ctrl · Fn)
- *  raise : Fn(맨 아래 맨 오른쪽) — Esc 자리 = `, Space 자리 = Space (3초 누르고 떼면 전원 끄기), F1~F12, / = ↑, 아래 줄 = ← ↓ →, Z/X/C = 백라이트, Q/W/E/R = 블루투스 1~4,
+ *  raise : Fn(맨 아래 맨 오른쪽) — Esc 자리 = `, Space 자리 = Soft Off (3초 누르고 떼면 전원 끄기, 다시 켤 때도 Fn + Space 3초), F1~F12, / = ↑, 아래 줄 = ← ↓ →, Z/X/C = 백라이트, Q/W/E/R = 블루투스 1~4,
  *          T = USB/블루투스 전환, Enter = 부트로더, \ = Studio 잠금 해제
  *  media : Fn + 오른쪽 Shift — 미디어·볼륨·밝기, A = 블루투스 전부 지우기, D = 현재 기기 지우기, PgUp/PgDn/Home/End
  */
@@ -78,7 +63,7 @@
         &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &BT_Profile3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
         &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
         &trans &bl BL_TOG &bl BL_DEC &bl BL_INC &trans &trans &trans &trans &trans &trans &kp UP &mo 3
-        &trans &trans &trans &pw_off 0 SPACE &kp LEFT &kp DOWN &kp RIGHT &trans
+        &trans &trans &trans &soft_off &kp LEFT &kp DOWN &kp RIGHT &trans
       >;
     };
 
