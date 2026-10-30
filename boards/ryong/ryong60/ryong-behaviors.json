@@ -1,7 +1,21 @@
 {
   "format": "ryong-behaviors",
   "version": 1,
-  "combos": [],
+  "combos": [
+    {
+      "id": "ry_combo_studio_unlock",
+      "name": "Studio Unlock (Esc + Backspace)",
+      "keys": [
+        0,
+        13
+      ],
+      "layers": [],
+      "timeout": 80,
+      "binding": {
+        "b": "studio_unlock"
+      }
+    }
+  ],
   "macros": [
     {
       "id": "BT_Profile0",
