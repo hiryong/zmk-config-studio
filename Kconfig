@@ -5,8 +5,8 @@ config BT60_POWER_CONFIRM
 
 if BT60_POWER_CONFIRM
 
-config BT60_POWER_CONFIRM_FN_POSITION
-    int "Key position of the Fn key"
+config RYONG_WAKE_POSITION
+    int "Key position of the wake key (set on key.ryong.com; must match ryong-wake.dtsi)"
     default 60
 
 config BT60_POWER_CONFIRM_FALLBACK_POSITION
