@@ -49,6 +49,16 @@
       bindings = <&soft_off>, <&kp>;
     };
 
+    // Tap dance (not placed on any key; pick it in ZMK Studio if wanted):
+    // tap once = Shift, tap twice = Caps Lock.
+    td_shift_caps: td_shift_caps {
+      compatible = "zmk,behavior-tap-dance";
+      display-name = "Shift / Caps (2x)";
+      #binding-cells = <0>;
+      tapping-term-ms = <200>;
+      bindings = <&kp LSHFT>, <&kp CAPS>;
+    };
+
     // Off only (no tap key): hold 3 s and release to turn off.
     off_3s: off_3s {
       compatible = "zmk,behavior-soft-off";
