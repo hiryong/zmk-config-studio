@@ -36,6 +36,28 @@
     };
 
   behaviors {
+    // Power-off behaviors (not placed on any key; pick them in ZMK Studio if wanted).
+    // Turning off/on with Fn+Space works without them (src/bt60_power_confirm.c),
+    // and turning back on is always Fn+Space held 3 s.
+
+    // Hold-tap: tap = Space, hold 3 s = turn off (on release).
+    space_off: space_off {
+      compatible = "zmk,behavior-hold-tap";
+      display-name = "Space / Off (3s)";
+      #binding-cells = <2>;
+      flavor = "tap-preferred";
+      tapping-term-ms = <3000>;
+      bindings = <&soft_off>, <&kp>;
+    };
+
+    // Off only: hold 3 s and release to turn off.
+    off_3s: off_3s {
+      compatible = "zmk,behavior-soft-off";
+      display-name = "Off (hold 3s)";
+      #binding-cells = <0>;
+      hold-time-ms = <3000>;
+    };
+
     // Tap dance (not placed on any key; pick it in ZMK Studio if wanted):
     // tap once = Shift, tap twice = Caps Lock.
     td_shift_caps: td_shift_caps {
