@@ -12,7 +12,7 @@ ryong60(61키 무선, Rule60 v3 6.25u 기반 + 키별 흰색 백라이트) 용 Z
 | 백라이트 기본값 | 처음 켜면 꺼진 상태, 켜면 밝기 40%, 단계 20%, 키 입력이 없으면 자동 꺼짐. PWM 8kHz (가장 어두운 밝기에서도 잔상 없음, P0.03 은 Nordic 권장상 10kHz 이하 핀) |
 | RGB 언더글로우 | 사용 안 함 (`CONFIG_ZMK_RGB_UNDERGLOW=n`, `CONFIG_ZMK_EXT_POWER=n`). RGB 전원 스위치는 보드의 풀다운 저항 때문에 기본이 꺼짐이라 RGB LED 대기 전류(약 10mA)도 없음. 다시 쓰려면 `zmk-rule60_defconfig` 안내대로 =y 로 바꾸고 다시 빌드. 그때는 `ryong60_power.c` 가 자동으로 켜져서, RGB 가 꺼진 채 부팅하면 2초 뒤 RGB 전원도 끄고, RGB 켜기 키를 누르면 전원이 다시 켜짐 (두 설정 모두 빌드 확인) |
 | 절전 | 15분 동안 입력이 없으면 잠듦 (BT60 V2 설정과 같음), 아무 키나 누르면 깸 |
-| 전원 끄기/켜기 | **Fn + Esc 3초** (백라이트가 한 번 깜빡이면 손 떼기). 끈 뒤에는 켤 때도 Fn + Esc 3초 — 아니면 8초 안에 다시 꺼짐. USB 연결·리셋 버튼·슬라이드 스위치로는 바로 켜짐. Fn + Esc 짧게 = ` |
+| 전원 끄기/켜기 | **Fn + Space 3초** (백라이트가 한 번 깜빡이면 손 떼기). 끈 뒤에는 켤 때도 Fn + Space 3초 — 아니면 8초 안에 다시 꺼짐. USB 연결·리셋 버튼·슬라이드 스위치로는 바로 켜짐. Fn + Space 짧게 = Space, Fn + Esc = ` |
 | ZMK Studio | `CONFIG_ZMK_STUDIO=y` (USB 연결로 키 배치 변경) |
 | ZMK 버전 | `v0.3` 으로 고정 (보드 폴더가 이 버전 구조에 맞음) |
 | 키맵 | 사용자의 BT60 V2 키맵([hiryong/zmk-config-studio](https://github.com/hiryong/zmk-config-studio))을 그대로 옮김 |

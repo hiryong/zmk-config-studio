@@ -37,12 +37,12 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 #endif
 
 /*
- * ryong60: 전원 끄기 / 켜기 = Fn + Esc 3초
+ * ryong60: 전원 끄기 / 켜기 = Fn + Space 3초
  *
- *  끄기: 키맵의 gr_off(Fn 층 Esc 자리)가 3초 넘게 눌린 뒤 떼면 ZMK soft off.
+ *  끄기: 키맵의 pw_off(Fn 층 Space 자리)가 3초 넘게 눌린 뒤 떼면 ZMK soft off.
  *        이 파일은 그 순간 '키로 끈 것' 표시(GPREGRET2)를 남김 — 15분 자동 절전과 구분하려고.
- *  켜기: 끈 뒤에는 Esc 하나만 칩을 깨움(dts). 깨어났을 때 표시가 있으면
- *        Fn+Esc 가 3초 동안 눌려 있어야 켜진 채로 둠. 아니면(가방 속에서 Esc 가 눌린 경우 등) 8초 안에 다시 끔.
+ *  켜기: 끈 뒤에는 Space 하나만 칩을 깨움(dts). 깨어났을 때 표시가 있으면
+ *        Fn+Space 가 3초 동안 눌려 있어야 켜진 채로 둠. 아니면(가방 속에서 Space 가 눌린 경우 등) 8초 안에 다시 끔.
  *        확인하는 동안 키 입력은 컴퓨터로 보내지 않음.
  *  예외: USB 를 꽂아서 깨거나, 리셋 버튼, 슬라이드 스위치로 껐다 켜면 바로 켜짐.
  *  3초가 되는 순간 백라이트가 한 번 깜빡임 → 손을 떼면 됨.
@@ -56,14 +56,14 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 #include <zmk/backlight.h>
 #endif
 
-#define R60_POS_ESC 0       /* 키 위치 번호: Esc (맨 위 맨 왼쪽) */
+#define R60_POS_KEY 56      /* 키 위치 번호: Space (맨 아래 줄 4번째, RC(4,6)) */
 #define R60_POS_FN 60       /* 키 위치 번호: Fn (맨 아래 맨 오른쪽) */
 #define R60_HOLD_MS 3000
 #define R60_GUARD_MS 8000
 #define R60_FLAG 0xA4       /* GPREGRET2 표시값 (0번 비트는 비움: 부트로더 CRC 건너뛰기 비트와 겹치지 않게) */
 
-static bool r60_fn, r60_esc;          /* 지금 눌려 있는지 */
-static int64_t r60_esc_t = -1;        /* Fn 을 누른 상태에서 Esc 를 누른 시각 */
+static bool r60_fn, r60_key;          /* 지금 눌려 있는지 */
+static int64_t r60_key_t = -1;        /* Fn 을 누른 상태에서 Space 를 누른 시각 */
 static bool r60_guard, r60_ok;
 static int r60_held;                  /* 확인 중에 눌려 있는 키 수 */
 
@@ -96,9 +96,9 @@ static void r60_blink_end(struct k_work *w) {
 #endif
 }
 
-/* 3초 지점: 아직 Fn+Esc 가 눌려 있으면 깜빡임 (끌 때·켤 때 모두) */
+/* 3초 지점: 아직 Fn+Space 가 눌려 있으면 깜빡임 (끌 때·켤 때 모두) */
 static void r60_hold_reached(struct k_work *w) {
-    if (r60_fn && r60_esc) {
+    if (r60_fn && r60_key) {
         if (r60_guard) {
             r60_ok = true; /* 켜기 확인 완료 */
         }
@@ -108,14 +108,14 @@ static void r60_hold_reached(struct k_work *w) {
 static K_WORK_DELAYABLE_DEFINE(r60_hold_work, r60_hold_reached);
 
 /* 확인 시간 초과 → 다시 끔.
- * Esc 가 계속 눌려 있으면(가방 속에서 눌린 채 등) 바로 끄면 즉시 다시 깨어나 재부팅을 반복하므로, 뗄 때까지 기다렸다가 끔 */
+ * Space 가 계속 눌려 있으면(가방 속에서 눌린 채 등) 바로 끄면 즉시 다시 깨어나 재부팅을 반복하므로, 뗄 때까지 기다렸다가 끔 */
 static void r60_guard_timeout(struct k_work *w);
 static K_WORK_DELAYABLE_DEFINE(r60_guard_work, r60_guard_timeout);
 static void r60_guard_timeout(struct k_work *w) {
     if (!r60_guard || r60_ok) {
         return;
     }
-    if (r60_esc) {
+    if (r60_key) {
         k_work_reschedule(&r60_guard_work, K_MSEC(500));
         return;
     }
@@ -138,19 +138,19 @@ static int r60_listener(const zmk_event_t *eh) {
     if (ev->position == R60_POS_FN) {
         r60_fn = down;
     }
-    if (ev->position == R60_POS_ESC) {
+    if (ev->position == R60_POS_KEY) {
         if (down) {
-            r60_esc_t = r60_fn ? ev->timestamp : -1;
-        } else if (!r60_guard && r60_esc_t >= 0 && ev->timestamp - r60_esc_t > R60_HOLD_MS) {
+            r60_key_t = r60_fn ? ev->timestamp : -1;
+        } else if (!r60_guard && r60_key_t >= 0 && ev->timestamp - r60_key_t > R60_HOLD_MS) {
             /* 곧 키맵의 gr_off 가 soft off 를 부름 → 키로 끈 것 표시 */
             r60_set_flag();
             k_work_reschedule(&r60_flag_clear_work, K_MSEC(1000));
         }
-        r60_esc = down;
+        r60_key = down;
     }
-    if (r60_fn && r60_esc && (ev->position == R60_POS_FN || ev->position == R60_POS_ESC) && down) {
+    if (r60_fn && r60_key && (ev->position == R60_POS_FN || ev->position == R60_POS_KEY) && down) {
         k_work_reschedule(&r60_hold_work, K_MSEC(R60_HOLD_MS));
-    } else if (!(r60_fn && r60_esc)) {
+    } else if (!(r60_fn && r60_key)) {
         k_work_cancel_delayable(&r60_hold_work);
     }
 

@@ -23,14 +23,14 @@
 
 / {
   behaviors {
-    // 즉시 끄기(떼는 순간). 아래 gr_off 의 '길게 누름' 쪽에서만 씀
+    // 즉시 끄기(떼는 순간). 아래 pw_off 의 '길게 누름' 쪽에서만 씀
     so_now: so_now {
       compatible = "zmk,behavior-soft-off";
       #binding-cells = <0>;
     };
-    // Fn + Esc : 짧게 = ` (원래 기능), 3초 넘게 누른 뒤 떼면 = 전원 끄기
-    //   다시 켤 때도 Fn + Esc 3초 (ryong60_power.c). 백라이트가 한 번 깜빡이면 3초가 된 것 → 손 떼기
-    gr_off: gr_off {
+    // Fn + Space : 짧게 = Space (원래 기능), 3초 넘게 누른 뒤 떼면 = 전원 끄기
+    //   다시 켤 때도 Fn + Space 3초 (ryong60_power.c). 백라이트가 한 번 깜빡이면 3초가 된 것 → 손 떼기
+    pw_off: pw_off {
       compatible = "zmk,behavior-hold-tap";
       #binding-cells = <2>;
       flavor = "tap-preferred";
@@ -44,7 +44,7 @@
  * ryong60 키맵 — 사용자의 BT60 V2 설정(hiryong/zmk-config-studio, bt60_v2.keymap)을 그대로 옮김
  *  base  : Mac 배열 (Ctrl · Alt(Option) · GUI(Cmd) · Space · GUI · Alt · Ctrl · Fn)
  *  os    : Fn + Tab 으로 켜고 끔 → Windows 배열 (Ctrl · Win · Alt · Space · Alt · Menu · Ctrl · Fn)
- *  raise : Fn(맨 아래 맨 오른쪽) — Esc 자리 = ` (3초 누르고 떼면 전원 끄기), F1~F12, / = ↑, 아래 줄 = ← ↓ →, Z/X/C = 백라이트, Q/W/E/R = 블루투스 1~4,
+ *  raise : Fn(맨 아래 맨 오른쪽) — Esc 자리 = `, Space 자리 = Space (3초 누르고 떼면 전원 끄기), F1~F12, / = ↑, 아래 줄 = ← ↓ →, Z/X/C = 백라이트, Q/W/E/R = 블루투스 1~4,
  *          T = USB/블루투스 전환, Enter = 부트로더, \ = Studio 잠금 해제
  *  media : Fn + 오른쪽 Shift — 미디어·볼륨·밝기, A = 블루투스 전부 지우기, D = 현재 기기 지우기, PgUp/PgDn/Home/End
  */
@@ -102,11 +102,11 @@
     raise {
       display-name = "raise";
       bindings = <
-        &gr_off 0 GRAVE &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12 &kp DEL
+        &kp GRAVE &kp F1 &kp F2 &kp F3 &kp F4 &kp F5 &kp F6 &kp F7 &kp F8 &kp F9 &kp F10 &kp F11 &kp F12 &kp DEL
         &tog 1 &BT_Profile0 &BT_Profile1 &BT_Profile2 &bt BT_SEL 3 &out OUT_TOG &trans &trans &kp INS &trans &kp PSCRN &trans &trans &studio_unlock
         &kp CAPS &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &trans &bootloader
         &trans &bl BL_TOG &bl BL_DEC &bl BL_INC &trans &trans &trans &trans &trans &trans &kp UP &mo 3
-        &trans &trans &trans &trans &kp LEFT &kp DOWN &kp RIGHT &trans
+        &trans &trans &trans &pw_off 0 SPACE &kp LEFT &kp DOWN &kp RIGHT &trans
       >;
     };
 
