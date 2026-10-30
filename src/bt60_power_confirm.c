@@ -1,13 +1,17 @@
 /*
- * BT60 V2: turn off with Fn+Space held 3 s, turn on only with Fn+Space held 3 s.
+ * BT60 V2: turn off with Fn + <off key> held 3 s, turn on with the same keys held 3 s.
+ * Default <off key> is Space; moving the off binding in ZMK Studio moves both.
  *
- * - Off: the keymap's hold-tap calls &soft_off. Every call of zmk_pm_soft_off()
- *   is wrapped (linker --wrap) so a mark is written to GPREGRET2 first.
- * - Wake: only the Space key can wake the chip from System OFF (see bt60.overlay).
+ * - Off: an off behavior in the keymap (&space_off hold-tap, &off_3s or &soft_off)
+ *   calls zmk_pm_soft_off(). It is wrapped (linker --wrap) so a mark is written
+ *   to GPREGRET2 first.
+ * - Wake: only the Fn key (bottom right) wakes the chip from System OFF
+ *   (see bt60.overlay). This is wiring, so it cannot be moved in Studio.
  * - Confirm: if the mark is set, the reset was not the reset pin and USB is not
- *   connected, key events are swallowed until Fn+Space is held for 3 s. If that
- *   does not happen within the timeout, the keyboard goes back to soft-off.
- *   While Fn+Space is being held, the timeout waits for it.
+ *   connected, key events are swallowed until Fn plus a key that carries an off
+ *   behavior in the current keymap (Studio changes included) are held for 3 s.
+ *   Press order does not matter. If that does not happen within the timeout,
+ *   the keyboard goes back to soft-off. While the keys are held, the timeout waits.
  * - 15 min idle sleep does not call zmk_pm_soft_off(), so it still wakes on any key.
  */
 
@@ -16,7 +20,11 @@
 #include <zephyr/logging/log.h>
 #include <hal/nrf_power.h>
 
+#include <drivers/behavior.h>
+#include <zmk/behavior.h>
 #include <zmk/event_manager.h>
+#include <zmk/keymap.h>
+#include <zmk/matrix.h>
 #include <zmk/events/position_state_changed.h>
 #include <zmk/pm.h>
 
@@ -31,9 +39,61 @@ LOG_MODULE_REGISTER(bt60_power_confirm, CONFIG_ZMK_LOG_LEVEL);
 
 static bool confirming;
 static bool timed_out;
-static bool fn_down;
-static bool space_down;
-static uint64_t swallowed; /* positions pressed while confirming, release still owed */
+static uint64_t swallowed; /* keys pressed while confirming; their release is swallowed too */
+static uint64_t held;      /* keys currently held while confirming */
+
+/* Behaviors that count as "off" when looking for the off key in the keymap. */
+static bool is_off_behavior(const char *name) {
+    if (name == NULL) {
+        return false;
+    }
+    const struct device *dev = zmk_behavior_get_binding(name);
+    if (dev == NULL) {
+        return false;
+    }
+#if DT_NODE_EXISTS(DT_NODELABEL(space_off))
+    if (dev == DEVICE_DT_GET(DT_NODELABEL(space_off))) {
+        return true;
+    }
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(off_3s))
+    if (dev == DEVICE_DT_GET(DT_NODELABEL(off_3s))) {
+        return true;
+    }
+#endif
+#if DT_NODE_EXISTS(DT_NODELABEL(soft_off))
+    if (dev == DEVICE_DT_GET(DT_NODELABEL(soft_off))) {
+        return true;
+    }
+#endif
+    return false;
+}
+
+/* Key positions that carry an off behavior on any layer of the current keymap. */
+static uint64_t off_keys(void) {
+    uint64_t mask = 0;
+    for (int l = 0; l < ZMK_KEYMAP_LAYERS_LEN; l++) {
+        zmk_keymap_layer_id_t id = zmk_keymap_layer_index_to_id(l);
+        if (id == ZMK_KEYMAP_LAYER_ID_INVAL) {
+            continue;
+        }
+        for (int p = 0; p < ZMK_KEYMAP_LEN && p < MAX_POS; p++) {
+            const struct zmk_behavior_binding *b = zmk_keymap_get_layer_binding_at_idx(id, p);
+            if (b != NULL && is_off_behavior(b->behavior_dev)) {
+                mask |= BIT64(p);
+            }
+        }
+    }
+    mask &= ~BIT64(POS_FN);
+    if (mask == 0) {
+        mask = BIT64(POS_SPACE);
+    }
+    return mask;
+}
+
+static bool combo_held(void) {
+    return (held & BIT64(POS_FN)) && (held & off_keys());
+}
 
 static void hold_done(struct k_work *work);
 static void timeout_done(struct k_work *work);
@@ -67,8 +127,8 @@ static void power_off_now(struct k_work *work) {
 }
 
 static void hold_done(struct k_work *work) {
-    if (confirming && fn_down && space_down) {
-        LOG_INF("Fn+Space held, starting normally");
+    if (confirming && combo_held()) {
+        LOG_INF("Fn + off key held, starting normally");
         confirming = false;
         k_work_cancel_delayable(&timeout_work);
     }
@@ -78,7 +138,7 @@ static void timeout_done(struct k_work *work) {
     if (!confirming) {
         return;
     }
-    if (fn_down && space_down) {
+    if (combo_held()) {
         /* Combo is being held: wait for it to finish or be released. */
         timed_out = true;
         return;
@@ -105,17 +165,13 @@ static int on_position(const zmk_event_t *eh) {
 
     if (ev->state) {
         swallowed |= bit;
+        held |= bit;
     } else {
         swallowed &= ~bit;
+        held &= ~bit;
     }
 
-    if (ev->position == POS_FN) {
-        fn_down = ev->state;
-    } else if (ev->position == POS_SPACE) {
-        space_down = ev->state;
-    }
-
-    if (fn_down && space_down) {
+    if (combo_held()) {
         if (!k_work_delayable_is_pending(&hold_work)) {
             k_work_schedule(&hold_work, K_MSEC(CONFIG_BT60_POWER_CONFIRM_HOLD_MS));
         }
