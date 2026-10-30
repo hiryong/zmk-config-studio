@@ -14,19 +14,6 @@
 // (src/bt60_power_confirm.c).
 
 / {
-
-  behaviors {
-    // Empty hold-tap: pick the hold key and the tap key in ZMK Studio.
-    hold_tap: hold_tap {
-      compatible = "zmk,behavior-hold-tap";
-      display-name = "Hold-Tap";
-      #binding-cells = <2>;
-      flavor = "hold-preferred";
-      tapping-term-ms = <200>;
-      bindings = <&kp>, <&kp>;
-    };
-  };
-
   chosen {
     zmk,physical-layout = &layout_60_ansi;
   };

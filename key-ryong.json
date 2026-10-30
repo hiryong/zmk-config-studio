@@ -9,10 +9,13 @@
       "workflow": "build.yml",
       "artifact": "firmware",
       "keymap": "config/bt60.keymap",
-      "match": ["Cheeto"],
+      "match": [
+        "Cheeto"
+      ],
       "unlockKey": "Fn + \\",
       "bootloaderKey": "Fn + Enter",
-      "layout": "60-ansi"
+      "layout": "60-ansi",
+      "powerKey": "Soft Off key, hold 3 s · on: Fn + that key, 3 s (only Fn wakes it)"
     },
     {
       "id": "bt60-oreo",
@@ -22,10 +25,13 @@
       "workflow": "build.yml",
       "artifact": "firmware",
       "keymap": "config/bt60.keymap",
-      "match": ["Oreo"],
+      "match": [
+        "Oreo"
+      ],
       "unlockKey": "Fn + \\",
       "bootloaderKey": "Fn + Enter",
-      "layout": "60-ansi"
+      "layout": "60-ansi",
+      "powerKey": "Soft Off key, hold 3 s · on: Fn + that key, 3 s (only Fn wakes it)"
     }
   ]
 }
