@@ -10,11 +10,11 @@ ryong60(61키 무선, Rule60 v3 6.25u 기반 + 키별 흰색 백라이트) 용 Z
 | 이름 | `CONFIG_ZMK_KEYBOARD_NAME="ryong60"` |
 | 백라이트 | P0.03 → PWM0 → AO3400A(저측 스위치) → LED 61개. `zmk,backlight` 등록 |
 | 백라이트 기본값 | 처음 켜면 꺼진 상태, 켜면 밝기 40%, 단계 20%, 키 입력이 없으면 자동 꺼짐. PWM 8kHz (가장 어두운 밝기에서도 잔상 없음, P0.03 은 Nordic 권장상 10kHz 이하 핀) |
-| RGB 언더글로우 | 사용 안 함 (`CONFIG_ZMK_RGB_UNDERGLOW=n`, `CONFIG_ZMK_EXT_POWER=n`). RGB 전원 스위치는 보드의 풀다운 저항 때문에 기본이 꺼짐이라 RGB LED 대기 전류(약 10mA)도 없음. 다시 쓰려면 `zmk-rule60_defconfig` 안내대로 =y 로 바꾸고 다시 빌드. 그때는 `ryong60_power.c` 가 자동으로 켜져서, RGB 가 꺼진 채 부팅하면 2초 뒤 RGB 전원도 끄고, RGB 켜기 키를 누르면 전원이 다시 켜짐 (두 설정 모두 빌드 확인) |
+| RGB 언더글로우 | 사용 안 함 (`CONFIG_ZMK_RGB_UNDERGLOW=n`, `CONFIG_ZMK_EXT_POWER=n`). RGB 전원 스위치는 보드의 풀다운 저항 때문에 기본이 꺼짐이라 RGB LED 대기 전류(약 10mA)도 없음. 다시 쓰려면 `boards/ryong/ryong60/ryong60_nrf52840_zmk_defconfig` 안내대로 =y 로 바꾸고 다시 빌드. 그때는 `ryong60_power.c` 가 자동으로 켜져서, RGB 가 꺼진 채 부팅하면 2초 뒤 RGB 전원도 끄고, RGB 켜기 키를 누르면 전원이 다시 켜짐 (두 설정 모두 빌드 확인) |
 | 절전 | 15분 동안 입력이 없으면 잠듦 (BT60 V2 설정과 같음), 아무 키나 누르면 깸 |
 | 전원 끄기/켜기 | **Fn + Space 3초** (백라이트가 한 번 깜빡이면 손 떼기). 끈 뒤에는 켤 때도 Fn + Space 3초 — 아니면 8초 안에 다시 꺼짐. USB 연결·리셋 버튼·슬라이드 스위치로는 바로 켜짐. Fn + Space 짧게 = Space, Fn + Esc = ` |
 | ZMK Studio | `CONFIG_ZMK_STUDIO=y` (USB 연결로 키 배치 변경) |
-| ZMK 버전 | `v0.3` 으로 고정 (보드 폴더가 이 버전 구조에 맞음) |
+| ZMK 버전 | 항상 최신(`main`). 보드 폴더는 새 형식(`boards/ryong/ryong60`, 빌드 대상 `ryong60//zmk`) |
 | 키맵 | 사용자의 BT60 V2 키맵([hiryong/zmk-config-studio](https://github.com/hiryong/zmk-config-studio))을 그대로 옮김 |
 
 ## 키 조작 (BT60 V2 와 같음)
@@ -37,9 +37,9 @@ ryong60(61키 무선, Rule60 v3 6.25u 기반 + 키별 흰색 백라이트) 용 Z
 
 1. 이 폴더를 GitHub 새 저장소로 올립니다 (폴더 구조 그대로).
 2. 저장소의 **Actions** 탭에서 빌드가 자동으로 돌고, 끝나면 `ryong60` 아티팩트(.uf2)가 생깁니다.
-3. 빌드 목록은 `build.yaml` (보드 `zmk-rule60`, Studio 용 snippet `studio-rpc-usb-uart`).
+3. 빌드 목록은 `build.yaml` (보드 `ryong60//zmk`, Studio 용 snippet `studio-rpc-usb-uart`).
 
-> **빌드 확인 완료 (2026-10-29)**: ZMK v0.3 / Zephyr 3.5 / Zephyr SDK 0.16.8 로 이 폴더 그대로 빌드 성공.
+> **빌드 확인 완료 (2026-10-30)**: ZMK main(Zephyr 4) 에서 GitHub Actions 빌드 성공. (이전: 2026-10-29 ZMK v0.3)
 > 플래시 27% · RAM 26% 사용, 백라이트 PWM 핀 P0.03 (8kHz), 블루투스 이름 ryong60, 절전 15분, 백라이트 기본 꺼짐, RGB 사용 안 함 확인.
 > 그때 만든 펌웨어가 `ryong60.uf2` 로 들어 있어 GitHub 없이 바로 써도 됩니다.
 
