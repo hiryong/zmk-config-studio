@@ -47,28 +47,6 @@
         >;
     };
 
-    // ryong60: 전원 끄기(soft off) 뒤에는 Fn 키 하나만 칩을 깨움 (ZMK 'Wakeup-only Key Switch' 방식).
-    //   ROW4(P0.22)를 켜 둔 채 COL13(P0.31)을 감시 → ROW4×COL13 = Fn(맨 아래 맨 오른쪽)만 반응, 다른 키는 무시.
-    //   깨어난 뒤에는 ryong60_power.c 가 Fn + Soft Off 키를 3초 누르고 있는지 확인하고, 아니면 다시 끔.
-    //   (15분 무입력 자동 절전은 이와 별개로 아무 키나 누르면 깨어남)
-    wake_keys {
-      compatible = "gpio-keys";
-      fn_wake_key: fn_wake_key {
-        gpios = <&gpio0 31 (GPIO_ACTIVE_HIGH | GPIO_PULL_DOWN)>;
-      };
-    };
-
-    fn_wakeup: fn_wakeup {
-      compatible = "zmk,gpio-key-wakeup-trigger";
-      trigger = <&fn_wake_key>;
-      wakeup-source;
-      extra-gpios = <&gpio0 22 GPIO_ACTIVE_HIGH>;
-    };
-
-    soft_off_wakers {
-      compatible = "zmk,soft-off-wakeup-sources";
-      wakeup-sources = <&fn_wakeup>;
-    };
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";
@@ -234,3 +212,9 @@ zephyr_udc0: &usbd {
 // ryong60: REG1 DC/DC 는 켜지 않음 (LDO).
 //   E73 모듈은 DCC(REG1 DC/DC) 핀을 밖으로 내지 않아 인덕터 유무를 보드에서 확인할 수 없음.
 //   원본 RULE-V3 펌웨어(실제 동작 확인)도 DC/DC 를 쓰지 않았으므로 같은 설정 유지 — LDO 는 인덕터와 무관하게 항상 동작.
+
+// ryong60: 전원 끄기(soft off) 뒤에 칩을 깨우는 키 (기본 Fn, 맨 아래 맨 오른쪽).
+//   key.ryong.com 이 ryong-power.json 으로 만드는 파일 — 사이트의 펌웨어 → 편집 → 깨우기 키에서 바꿈.
+//   깨어난 뒤에는 ryong60_power.c 가 깨우기 키 + Soft Off 키를 3초 누르고 있는지 확인하고, 아니면 다시 끔.
+//   (15분 무입력 자동 절전은 이와 별개로 아무 키나 누르면 깨어남)
+#include "ryong-wake.dtsi"

@@ -42,7 +42,7 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
  *  끄기: ZMK 공식 Soft Off. 키맵에서는 Fn + 왼쪽 Ctrl 자리. ZMK Studio 로 아무 키에나 옮길 수 있음.
  *        누르고 있어야 하는 시간은 Soft Off 의 hold-time-ms (key.ryong.com 설정 탭).
  *        Fn 을 누른 채로 꺼지면 Fn 을 뗄 때까지 기다렸다가 끔 — Fn 이 깨우는 키라서 바로 다시 깨어나지 않게.
- *  깨우기: 끈 뒤에는 Fn 하나만 칩을 깨움 (dts). 배선으로 정해져 있어서 Fn 은 그 자리에 있어야 함.
+ *  깨우기: 끈 뒤에는 깨우기 키(기본 Fn) 하나만 칩을 깨움 (ryong-wake.dtsi, key.ryong.com 에서 바꿈).
  *  켜기: 깨어나면 지금 키맵(ZMK Studio 로 바꾼 것 포함)에서 Soft Off 가 있는 키를 찾아,
  *        Fn + 그 키를 함께 3초 누르면 켜짐 (누르는 순서 상관없음). 그동안 키 입력은 컴퓨터로 보내지 않음.
  *        8초 안에 안 되면 다시 꺼짐. 키가 눌려 있는 동안은 기다림. 3초가 되는 순간 백라이트가 한 번 깜빡임.
@@ -66,7 +66,7 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 
 LOG_MODULE_REGISTER(ryong60_power, CONFIG_ZMK_LOG_LEVEL);
 
-#define R60_POS_FN 60       /* Fn (맨 아래 맨 오른쪽, RC(4,13)) — 깨우는 키 */
+#define R60_POS_FN CONFIG_RYONG_WAKE_POSITION /* 깨우는 키 (기본 Fn, 맨 아래 맨 오른쪽) — key.ryong.com 에서 바꿈 */
 #define R60_POS_FALLBACK 53 /* 왼쪽 Ctrl: 키맵에 Soft Off 가 하나도 없을 때 대신 쓰는 키 */
 #define R60_HOLD_MS 3000
 #define R60_TIMEOUT_MS 8000
