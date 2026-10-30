@@ -39,7 +39,7 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 /*
  * ryong60: 전원 끄기 / 켜기 (BT60 V2 Oreo·Cheeto 의 bt60_power_confirm.c 와 같은 방식)
  *
- *  끄기: ZMK 공식 Soft Off. 키맵에서는 Fn + Space 자리. ZMK Studio 로 아무 키에나 옮길 수 있음.
+ *  끄기: ZMK 공식 Soft Off. 키맵에서는 Fn + 왼쪽 Ctrl 자리. ZMK Studio 로 아무 키에나 옮길 수 있음.
  *        누르고 있어야 하는 시간은 Soft Off 의 hold-time-ms (key.ryong.com 설정 탭).
  *        Fn 을 누른 채로 꺼지면 Fn 을 뗄 때까지 기다렸다가 끔 — Fn 이 깨우는 키라서 바로 다시 깨어나지 않게.
  *  깨우기: 끈 뒤에는 Fn 하나만 칩을 깨움 (dts). 배선으로 정해져 있어서 Fn 은 그 자리에 있어야 함.
@@ -67,7 +67,7 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 LOG_MODULE_REGISTER(ryong60_power, CONFIG_ZMK_LOG_LEVEL);
 
 #define R60_POS_FN 60       /* Fn (맨 아래 맨 오른쪽, RC(4,13)) — 깨우는 키 */
-#define R60_POS_FALLBACK 56 /* Space: 키맵에 Soft Off 가 하나도 없을 때 대신 쓰는 키 */
+#define R60_POS_FALLBACK 53 /* 왼쪽 Ctrl: 키맵에 Soft Off 가 하나도 없을 때 대신 쓰는 키 */
 #define R60_HOLD_MS 3000
 #define R60_TIMEOUT_MS 8000
 #define R60_MARK_REG 1      /* GPREGRET2 (GPREGRET 은 부트로더가 씀) */
