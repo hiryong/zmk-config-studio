@@ -1,0 +1,152 @@
+{
+  "format": "ryong-behaviors",
+  "version": 1,
+  "combos": [],
+  "macros": [
+    {
+      "id": "BT_Profile0",
+      "name": "BT_PROFILE0",
+      "wait": 40,
+      "tap": 40,
+      "steps": [
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_SEL 0"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 1"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 2"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "BT_Profile1",
+      "name": "BT_PROFILE1",
+      "wait": 40,
+      "tap": 40,
+      "steps": [
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_SEL 1"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 0"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 2"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "BT_Profile2",
+      "name": "BT_PROFILE2",
+      "wait": 40,
+      "tap": 40,
+      "steps": [
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_SEL 2"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 0"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 1"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 3"
+          }
+        }
+      ]
+    },
+    {
+      "id": "BT_Profile3",
+      "name": "BT_PROFILE3",
+      "wait": 40,
+      "tap": 40,
+      "steps": [
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_SEL 3"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 0"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 1"
+          }
+        },
+        {
+          "t": "tap",
+          "binding": {
+            "b": "bt",
+            "cmd": "BT_DISC 2"
+          }
+        }
+      ]
+    }
+  ],
+  "tapDances": []
+}
