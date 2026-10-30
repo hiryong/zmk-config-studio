@@ -231,6 +231,6 @@ zephyr_udc0: &usbd {
     };
 };
 
-&reg1 {
-    regulator-initial-mode = <NRF5X_REG_MODE_DCDC>;
-};
+// ryong60: REG1 DC/DC 는 켜지 않음 (LDO).
+//   E73 모듈은 DCC(REG1 DC/DC) 핀을 밖으로 내지 않아 인덕터 유무를 보드에서 확인할 수 없음.
+//   원본 RULE-V3 펌웨어(실제 동작 확인)도 DC/DC 를 쓰지 않았으므로 같은 설정 유지 — LDO 는 인덕터와 무관하게 항상 동작.

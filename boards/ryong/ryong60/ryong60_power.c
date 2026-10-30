@@ -51,6 +51,7 @@ SYS_INIT(ryong60_power_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 #include <hal/nrf_power.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/position_state_changed.h>
+#include <zmk/events/activity_state_changed.h>
 #include <zmk/pm.h>
 #if IS_ENABLED(CONFIG_ZMK_BACKLIGHT)
 #include <zmk/backlight.h>
@@ -142,7 +143,7 @@ static int r60_listener(const zmk_event_t *eh) {
         if (down) {
             r60_key_t = r60_fn ? ev->timestamp : -1;
         } else if (!r60_guard && r60_key_t >= 0 && ev->timestamp - r60_key_t > R60_HOLD_MS) {
-            /* 곧 키맵의 gr_off 가 soft off 를 부름 → 키로 끈 것 표시 */
+            /* 곧 키맵의 pw_off 가 soft off 를 부름 → 키로 끈 것 표시 */
             r60_set_flag();
             k_work_reschedule(&r60_flag_clear_work, K_MSEC(1000));
         }
@@ -171,6 +172,18 @@ static int r60_listener(const zmk_event_t *eh) {
 
 ZMK_LISTENER(a_ryong60_power_key, r60_listener);
 ZMK_SUBSCRIPTION(a_ryong60_power_key, zmk_position_state_changed);
+
+/* 켜기 확인 중(예: 가방 속에서 Space 가 계속 눌린 채)에 15분 자동 절전에 들어가면, 다시 깰 때도 확인하도록 표시를 남김
+ * (안 그러면 눌린 Space 로 깨어나 확인 없이 켜지고 Space 가 계속 입력됨) */
+static int r60_activity_listener(const zmk_event_t *eh) {
+    const struct zmk_activity_state_changed *ev = as_zmk_activity_state_changed(eh);
+    if (ev != NULL && ev->state == ZMK_ACTIVITY_SLEEP && r60_guard && !r60_ok) {
+        r60_set_flag();
+    }
+    return ZMK_EV_EVENT_BUBBLE;
+}
+ZMK_LISTENER(ryong60_power_activity, r60_activity_listener);
+ZMK_SUBSCRIPTION(ryong60_power_activity, zmk_activity_state_changed);
 
 static int r60_wake_check(void) {
     uint32_t why = nrf_power_resetreas_get(NRF_POWER);
