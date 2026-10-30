@@ -274,5 +274,22 @@
     ]
   ],
   "dtsi": "boards/ryong/ryong60/ryong-wake.dtsi",
-  "conf": "config/ryong60.conf"
+  "conf": "config/ryong60.conf",
+  "defaults": {
+    "ZMK_BACKLIGHT": "y",
+    "ZMK_BACKLIGHT_ON_START": "n",
+    "ZMK_RGB_UNDERGLOW": "n",
+    "ZMK_RGB_UNDERGLOW_ON_START": "y",
+    "ZMK_SLEEP": "y",
+    "ZMK_PM_SOFT_OFF": "y",
+    "ZMK_POINTING": "y",
+    "ZMK_HID_REPORT_TYPE_NKRO": "n",
+    "BT_CTLR_TX_PWR_PLUS_8": "n",
+    "ZMK_STUDIO_LOCKING": "y",
+    "ZMK_IDLE_SLEEP_TIMEOUT": "900000"
+  },
+  "hardware": [
+    "backlight",
+    "underglow"
+  ]
 }
