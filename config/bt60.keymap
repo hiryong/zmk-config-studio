@@ -37,7 +37,9 @@
 
   behaviors {
     // Fn+Space: tap = Space, hold 3 s = turn off (on release).
-    // Turning back on also needs Fn+Space held 3 s (src/bt60_power_confirm.c).
+    // Turning on: Fn wakes the keyboard, then Fn + the key holding an off behavior
+    // must be held 3 s (src/bt60_power_confirm.c). Moving space_off or off_3s to
+    // another key in ZMK Studio moves the turn-on combo with it.
     space_off: space_off {
       compatible = "zmk,behavior-hold-tap";
       display-name = "Space / Off (3s)";
@@ -45,6 +47,14 @@
       flavor = "tap-preferred";
       tapping-term-ms = <3000>;
       bindings = <&soft_off>, <&kp>;
+    };
+
+    // Off only (no tap key): hold 3 s and release to turn off.
+    off_3s: off_3s {
+      compatible = "zmk,behavior-soft-off";
+      display-name = "Off (hold 3s)";
+      #binding-cells = <0>;
+      hold-time-ms = <3000>;
     };
   };
 
