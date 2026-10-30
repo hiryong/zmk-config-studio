@@ -17,11 +17,6 @@
 #include <dt-bindings/zmk/pointing.h>
 #include "ryong-behaviors.dtsi"
 
-
-&soft_off {
-  hold-time-ms = <3000>; 
-};
-
 / {
   behaviors {
     // 즉시 끄기(떼는 순간). 아래 pw_off 의 '길게 누름' 쪽에서만 씀
@@ -50,7 +45,6 @@
  *  media : Fn + 오른쪽 Shift — 미디어·볼륨·밝기, A = 블루투스 전부 지우기, D = 현재 기기 지우기, PgUp/PgDn/Home/End
  */
 / {
-
 
   keymap {
     compatible = "zmk,keymap";

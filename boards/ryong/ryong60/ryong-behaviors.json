@@ -148,5 +148,13 @@
       ]
     }
   ],
-  "tapDances": []
+  "tapDances": [],
+  "settings": [
+    {
+      "behavior": "soft_off",
+      "props": {
+        "hold-time-ms": 3000
+      }
+    }
+  ]
 }
