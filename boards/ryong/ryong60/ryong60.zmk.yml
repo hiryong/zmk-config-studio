@@ -1,6 +1,6 @@
 file_format: "1"
-id: zmk-rule60
-name: zmk-rule60
+id: ryong60//zmk
+name: ryong60
 type: board
 arch: arm
 features:

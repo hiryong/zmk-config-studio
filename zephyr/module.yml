@@ -1,3 +1,5 @@
+name: ryong60
 build:
+  cmake: .
   settings:
     board_root: .
