@@ -2,3 +2,5 @@ name: bt60-power-confirm
 build:
   cmake: .
   kconfig: Kconfig
+  settings:
+    board_root: .
