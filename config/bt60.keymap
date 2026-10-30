@@ -8,12 +8,10 @@
 
 #define ANSI
 
-// Soft Off (official ZMK setting): the key must be held 3 s before release turns
-// the keyboard off. Place Soft Off on any key with ZMK Studio; turning back on is
-// Fn + that same key held 3 s (src/bt60_power_confirm.c).
-&soft_off {
-    hold-time-ms = <3000>;
-};
+// Soft Off (official ZMK setting): how long the key must be held before release turns the
+// keyboard off is set in ryong-behaviors.json (key.ryong.com → Combos & Macros → Settings).
+// Place Soft Off on any key with ZMK Studio; turning back on is Fn + that same key held 3 s
+// (src/bt60_power_confirm.c).
 
 / {
 
