@@ -7,6 +7,13 @@
 
 #define ANSI
 
+// Soft Off (official ZMK setting): the key must be held 3 s before release turns
+// the keyboard off. Place Soft Off on any key with ZMK Studio; turning back on is
+// Fn + that same key held 3 s (src/bt60_power_confirm.c).
+&soft_off {
+    hold-time-ms = <3000>;
+};
+
 / {
   macros {
         BT_Profile0: BT_Profile0 {
@@ -36,36 +43,14 @@
     };
 
   behaviors {
-    // Power-off behaviors (not placed on any key; pick them in ZMK Studio if wanted).
-    // Turning off/on with Fn+Space works without them (src/bt60_power_confirm.c),
-    // and turning back on is always Fn+Space held 3 s.
-
-    // Hold-tap: tap = Space, hold 3 s = turn off (on release).
-    space_off: space_off {
+    // Empty hold-tap: pick the hold key and the tap key in ZMK Studio.
+    hold_tap: hold_tap {
       compatible = "zmk,behavior-hold-tap";
-      display-name = "Space / Off (3s)";
+      display-name = "Hold-Tap";
       #binding-cells = <2>;
-      flavor = "tap-preferred";
-      tapping-term-ms = <3000>;
-      bindings = <&soft_off>, <&kp>;
-    };
-
-    // Off only: hold 3 s and release to turn off.
-    off_3s: off_3s {
-      compatible = "zmk,behavior-soft-off";
-      display-name = "Off (hold 3s)";
-      #binding-cells = <0>;
-      hold-time-ms = <3000>;
-    };
-
-    // Tap dance (not placed on any key; pick it in ZMK Studio if wanted):
-    // tap once = Shift, tap twice = Caps Lock.
-    td_shift_caps: td_shift_caps {
-      compatible = "zmk,behavior-tap-dance";
-      display-name = "Shift / Caps (2x)";
-      #binding-cells = <0>;
+      flavor = "hold-preferred";
       tapping-term-ms = <200>;
-      bindings = <&kp LSHFT>, <&kp CAPS>;
+      bindings = <&kp>, <&kp>;
     };
   };
 
