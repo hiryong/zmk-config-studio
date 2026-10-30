@@ -15,7 +15,7 @@
       "unlockKey": "Fn + \\",
       "bootloaderKey": "Fn + Enter",
       "layout": "60-ansi",
-      "powerKey": "Soft Off key, hold 3 s · on: Fn + that key, 3 s (only Fn wakes it)"
+      "powerKey": "Soft Off on Fn + Left Ctrl, hold 3 s · on: Fn + the Soft Off key, 3 s (only Fn wakes it)"
     },
     {
       "id": "bt60-oreo",
@@ -31,7 +31,7 @@
       "unlockKey": "Fn + \\",
       "bootloaderKey": "Fn + Enter",
       "layout": "60-ansi",
-      "powerKey": "Soft Off key, hold 3 s · on: Fn + that key, 3 s (only Fn wakes it)"
+      "powerKey": "Soft Off on Fn + Left Ctrl, hold 3 s · on: Fn + the Soft Off key, 3 s (only Fn wakes it)"
     }
   ]
 }
